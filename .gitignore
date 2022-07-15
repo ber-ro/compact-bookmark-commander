@@ -1,0 +1,4 @@
+/dist*
+/dev
+/prod
+/node_modules
