@@ -11,6 +11,7 @@ let paths = [
     "from": [
       "node_modules/bootstrap/dist/css/bootstrap.css",
       "node_modules/react-bootstrap/dist/react-bootstrap.min.js",
+      "node_modules/react-bootstrap/dist/react-bootstrap.min.js.LICENSE.txt",
       `node_modules/react-dom/umd/react-dom.${cfgJs}.js`,
       `node_modules/react/umd/react.${cfgJs}.js`,
       "node_modules/requirejs/require.js"
