@@ -1,4 +1,5 @@
 import React from 'react';
+import ReactDOM from 'react-dom/client';
 import { BookmarkList } from './BookmarkList';
 import { Toast, Toasts } from './Toasts';
 import { Container, Row, Col } from 'react-bootstrap';
@@ -78,5 +79,14 @@ class App extends React.Component<{}, AppState> {
     );
   }
 }
+
+const root = ReactDOM.createRoot(
+  document.getElementById('root') as HTMLElement
+);
+root.render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>
+);
 
 export default App;

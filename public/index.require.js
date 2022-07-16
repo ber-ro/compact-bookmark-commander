@@ -14,7 +14,7 @@ requirejs.config({
     }
   },
 });
-requirejs(["index"]);
+requirejs(["App"]);
 
 addCss("index.css");
 addCss("../lib/bootstrap.css");
