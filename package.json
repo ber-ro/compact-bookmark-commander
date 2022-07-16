@@ -1,5 +1,7 @@
 {
   "scripts": {
+    "precreate":"npm run build",
+    "create":"cd prod && powershell Compress-Archive -force * chrome.zip",
     "build": "babel src --extensions .tsx --out-dir prod/app && node build.mjs",
     "build:dev": "babel src --extensions .tsx --out-dir dev/app && node build.mjs --dev"
   },
