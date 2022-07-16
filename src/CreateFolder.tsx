@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Button, Modal, Form } from 'react-bootstrap';
 
 interface CreateFolderProps {
@@ -10,7 +10,7 @@ interface CreateFolderProps {
 }
 
 export function CreateFolder({ index, parentId, show, breadcrumbs, resetParentId }: CreateFolderProps) {
-  const [title, setTitle] = useState("")
+  const [title, setTitle] = React.useState("")
 
   const onFocus = (event: React.FocusEvent<HTMLInputElement>) => {
     event.target.select()

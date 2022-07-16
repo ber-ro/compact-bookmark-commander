@@ -1,4 +1,4 @@
-import React, { useState, useRef, useImperativeHandle, forwardRef } from 'react';
+import React from 'react';
 import { ToastContainer, Toast } from 'react-bootstrap';
 
 export interface Msg {
@@ -11,11 +11,11 @@ export interface Toast {
   addToast: (msg: Msg) => void
 }
 
-export const Toasts = forwardRef(function Toasts(props: {}, ref: React.Ref<Toast>) {
-  const [messages, setMessages] = useState<Msg[]>([]);
-  const id = useRef<number>();
+export const Toasts = React.forwardRef(function Toasts(props: {}, ref: React.Ref<Toast>) {
+  const [messages, setMessages] = React.useState<Msg[]>([]);
+  const id = React.useRef<number>();
 
-  useImperativeHandle(ref, () => ({
+  React.useImperativeHandle(ref, () => ({
     addToast: (msg: Msg) => {
       msg.id = id.current = id.current ? id.current + 1 : 1
       setMessages(messages.concat(msg))
