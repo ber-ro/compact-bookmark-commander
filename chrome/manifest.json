@@ -1,7 +1,7 @@
 {
   "name": "Compact Bookmark Commander",
   "description": "Show 2 independent bookmark folders side by side allowing file-like operations: move, delete, create folder, sort, ...",
-  "version": "0.1",
+  "version": "0.1.1",
   "manifest_version": 3,
   "permissions": [
     "bookmarks",
