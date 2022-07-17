@@ -27,6 +27,7 @@ export class BookmarkList extends React.Component<BookmarkListProps, BookmarkLis
 {
   ref: React.RefObject<HTMLDivElement> = React.createRef();
   scrollRef: React.RefObject<HTMLDivElement> = React.createRef();
+  operationIsPending = false
   constructor(props: BookmarkListProps) {
     super(props)
     this.state = {
@@ -83,11 +84,17 @@ export class BookmarkList extends React.Component<BookmarkListProps, BookmarkLis
     this.getChildren({ showCreateFolder: false })
   }
 
-  getChildren = async (state: Partial<BookmarkListState> = {}, setState = true) => {
+  getChildren = async (
+    state: Partial<BookmarkListState> = {}
+    , setState = true
+    , callback?: () => void
+  ) => {
     state.ancestors ??= this.state.ancestors
     while (!state.nodes)
       try {
-        state.nodes = await chrome.bookmarks.getChildren(this.parentId(state.ancestors))
+        state.nodes = await chrome.bookmarks.getChildren(
+          this.parentId(state.ancestors)
+        )
       } catch (e) {
         state.ancestors.pop()
       }
@@ -96,7 +103,7 @@ export class BookmarkList extends React.Component<BookmarkListProps, BookmarkLis
     if (state.index >= state.nodes.length)
       state.index = state.nodes.length - 1
     if (setState)
-      this.setState(state as BookmarkListState)
+      this.setState(state as BookmarkListState, callback)
     return state
   }
 
@@ -141,9 +148,13 @@ export class BookmarkList extends React.Component<BookmarkListProps, BookmarkLis
         })
     } else if (e.key === "F6") {
       const node = this.state.nodes[this.state.index]
-      if (node)
+      if (node && !this.operationIsPending) {
+        this.operationIsPending = true
         this.props.other.current?.move(node)
-          .finally(() => this.getChildren())
+          .finally(() => this.getChildren({}, true, () => {
+            this.operationIsPending = false
+          }))
+      }
     } else if (e.key === "F7") {
       this.setState({ showCreateFolder: true })
     } else if (e.key === "F9") {
@@ -189,9 +200,10 @@ export class BookmarkList extends React.Component<BookmarkListProps, BookmarkLis
   }
 
   delete(recurse: boolean) {
-    if (this.state.index < 0)
+    if (this.state.index < 0 || this.operationIsPending)
       return
 
+    this.operationIsPending = true
     const remove = recurse ? chrome.bookmarks.removeTree : chrome.bookmarks.remove
     remove(this.state.nodes[this.state.index].id)
       .then(() => {
@@ -199,10 +211,12 @@ export class BookmarkList extends React.Component<BookmarkListProps, BookmarkLis
         this.props.toasts.current?.addToast({ msg, type: "success" })
       })
       .catch((p) => {
-        const msg = this.state.nodes[this.state.index].title + " - " + p.message
+        const msg = this.state.nodes[this.state.index]?.title + " - " + p.message
         this.props.toasts.current?.addToast({ msg, type: "warning" })
       })
-      .then(() => this.getChildren())
+      .then(() => this.getChildren(
+        {}, true, () => { this.operationIsPending = false }
+      ))
   }
 
   async sort(key: string) {
