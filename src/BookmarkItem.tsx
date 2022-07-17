@@ -24,18 +24,22 @@ export class BookmarkItem extends React.Component<BookmarkProps, {}>
       this.ref = el
   }
 
-  isElementInViewport = () => {
+  scrollIntoView = (prev?: BookmarkProps) => {
+    if (!this.props.isCurrent || prev?.isCurrent)
+      return
+
     const el = this.ref?.getBoundingClientRect();
     const container = this.props.containerRef.current?.getBoundingClientRect();
-    return el && container && el.top >= container.top && el.bottom <= container.bottom;
+    if (!el || !container || el.top < container.top || el.bottom > container.bottom)
+      this.ref?.scrollIntoView({ block: "center" })
+  }
+
+  componentDidMount() {
+    this.scrollIntoView()
   }
 
   componentDidUpdate(prev: BookmarkProps) {
-    if (this.props.isCurrent
-      && this.props.isCurrent !== prev.isCurrent
-      && !this.isElementInViewport()
-    )
-      this.ref?.scrollIntoView({ block: "center" })
+    this.scrollIntoView(prev)
   }
 
   onClick = () => {
