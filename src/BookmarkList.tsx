@@ -179,7 +179,8 @@ export class BookmarkList extends React.Component<BookmarkListProps, BookmarkLis
       return
 
     if (node.url) {
-      window.open(node.url)
+      if (node.url.startsWith("http"))
+        window.open(node.url)
     } else {
       this.getChildren({ index: 0, ancestors: [...this.state.ancestors, node] })
     }
