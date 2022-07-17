@@ -59,7 +59,7 @@ export class BookmarkList extends React.Component<BookmarkListProps, BookmarkLis
     let ancestors: BookmarkTreeNode[] = []
     try {
       const key = this.props.side;
-      let id = (await chrome.storage.sync.get(key))[key] ?? "0"
+      let id = (await chrome.storage.local.get(key))[key] ?? "0"
       for (; ;) {
         const node = (await chrome.bookmarks.get(id))[0]
         ancestors.unshift(node)
@@ -91,7 +91,7 @@ export class BookmarkList extends React.Component<BookmarkListProps, BookmarkLis
       } catch (e) {
         state.ancestors.pop()
       }
-    chrome.storage.sync.set({ [this.props.side]: this.parentId(state.ancestors) })
+    chrome.storage.local.set({ [this.props.side]: this.parentId(state.ancestors) })
     state.index ??= this.state.index
     if (state.index >= state.nodes.length)
       state.index = state.nodes.length - 1
