@@ -8,8 +8,6 @@
     "storage"
   ],
   "host_permissions": [
-    "https://www.google.com/s2/favicons?domain=",
-    "https://*.gstatic.com/"
   ],
   "background": {
     "service_worker": "background.js"
