@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { BookmarkList } from './BookmarkList';
-import { Toast, Toasts } from './Toasts';
+import { ToastRef, Toasts } from './Toasts';
 import { Container, Row, Col } from 'react-bootstrap';
 
 interface AppState {
@@ -10,22 +10,26 @@ interface AppState {
 
 class App extends React.Component<{}, AppState> {
   pane: React.RefObject<BookmarkList>[] = Array.from([0, 1], () => React.createRef());
-  toasts = React.createRef<Toast>()
+  toasts = React.createRef<ToastRef>()
+  hasFocus = 0
   constructor(props: {}) {
     super(props);
     this.state = { showUrls: true };
   }
 
   componentDidMount() {
-    this.pane[0].current?.focus();
+    this.focus();
+  }
+
+  focus = () => {
+    this.pane[this.hasFocus].current?.focus();
   }
 
   onKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Tab") {
-      if (this.pane[0].current?.ref.current === document.activeElement)
-        this.pane[1].current?.focus();
-      else
-        this.pane[0].current?.focus();
+      this.hasFocus =
+        this.pane[0].current?.ref.current === document.activeElement ? 1 : 0
+      this.focus()
     } else if (e.key === "F3") {
       this.setState({ showUrls: !this.state.showUrls })
     } else {
@@ -74,7 +78,7 @@ class App extends React.Component<{}, AppState> {
             ))}
           </div>
         </Row>
-        <Toasts ref={this.toasts} />
+        <Toasts ref={this.toasts} focus={this.focus}/>
       </Container>
     );
   }
@@ -89,4 +93,5 @@ root.render(
   </React.StrictMode>
 );
 
+export { App };
 export default App;

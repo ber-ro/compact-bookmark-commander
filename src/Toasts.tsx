@@ -1,29 +1,75 @@
 import React from 'react';
-import { ToastContainer, Toast } from 'react-bootstrap';
+import { ToastContainer, Toast, Button } from 'react-bootstrap'
+type BookmarkTreeNode = chrome.bookmarks.BookmarkTreeNode
 
 export interface Msg {
   id?: number
   , type: string
   , msg: string
+  , undoInfo?: BookmarkTreeNode[]
 }
 
-export interface Toast {
+export interface ToastRef {
   addToast: (msg: Msg) => void
 }
 
-export const Toasts = React.forwardRef(function Toasts(props: {}, ref: React.Ref<Toast>) {
+interface ToastsProps {
+  focus: () => void
+}
+
+export const Toasts = React.forwardRef(ToastsComponent)
+function ToastsComponent(props: ToastsProps, ref: React.Ref<ToastRef>) {
   const [messages, setMessages] = React.useState<Msg[]>([]);
   const id = React.useRef<number>();
 
-  React.useImperativeHandle(ref, () => ({
-    addToast: (msg: Msg) => {
-      msg.id = id.current = id.current ? id.current + 1 : 1
-      setMessages(messages.concat(msg))
-    }
-  }));
+  React.useImperativeHandle(ref, () => ({ addToast }));
+
+  const addToast = (msg: Msg) => {
+    msg.id = id.current = (id.current ?? 0) + 1
+    setMessages(messages.concat(msg))
+  }
 
   const removeToast = (id: number | undefined) => {
     setMessages((messages) => messages.filter((e) => e.id !== id));
+  }
+
+  const CreateDetails = (obj: BookmarkTreeNode) => {
+    return Object.fromEntries(Object.entries(obj).filter(
+      ([key]) => ['index', 'parentId', 'title', 'url'].indexOf(key) != -1
+    ))
+  }
+
+  const undo = async (msg: Msg) => {
+    if (!msg.undoInfo)
+      return
+
+    const nodes = msg.undoInfo
+    while (nodes.length) {
+      const node = nodes.shift()
+      try {
+        const created = await chrome.bookmarks.create(CreateDetails(node!))
+        if (!node?.children)
+          continue
+
+        for (const i of node.children)
+          i.parentId = created.id
+        nodes.push(...node.children)
+      } catch (error) {
+        console.log(error)
+      }
+    }
+    removeToast(msg.id)
+    props.focus()
+  }
+
+  const UndoButton = (msg: Msg) => {
+    if (msg.undoInfo)
+      return (
+        <Button size="sm" onClick={() => undo(msg)}>
+          Undo
+        </Button>
+      )
+    return <></>
   }
 
   return (
@@ -32,11 +78,12 @@ export const Toasts = React.forwardRef(function Toasts(props: {}, ref: React.Ref
       position='bottom-end'>
       {messages.map((msg) => (
         <Toast key={msg.id}
-          bg={msg.type} autohide
+          bg={msg.type} autohide delay={15000}
           className={"d-flex m-1" + (msg.type === "success" ? " text-light" : "")}
           onClose={() => removeToast(msg.id)}>
           <Toast.Body className='d-flex flex-grow-1 justify-content-between align-items-center p-1'>
-            <div className='align-items-stretch'>{msg.msg}</div>
+            <div className='me-auto'>{msg.msg}</div>
+            {UndoButton(msg)}
             <button type="button"
               className={"btn-closeme-2 btn-close"
                 + (msg.type === "success" ? " btn-close-white" : "")}
@@ -47,4 +94,4 @@ export const Toasts = React.forwardRef(function Toasts(props: {}, ref: React.Ref
       ))}
     </ToastContainer>
   )
-})
+}

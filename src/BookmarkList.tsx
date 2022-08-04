@@ -1,7 +1,7 @@
 import React, { RefObject } from 'react';
 import { BookmarkItem } from './BookmarkItem';
 import { CreateFolder } from './CreateFolder'
-import { Toast as Toast } from './Toasts';
+import { ToastRef } from './Toasts';
 type BookmarkTreeNode = chrome.bookmarks.BookmarkTreeNode;
 
 interface BookmarkListState {
@@ -15,7 +15,7 @@ interface BookmarkListState {
 interface BookmarkListProps {
   side: string
   , other: RefObject<BookmarkList>
-  , toasts: RefObject<Toast>
+  , toasts: RefObject<ToastRef>
   , showUrls: boolean
 }
 
@@ -206,18 +206,21 @@ export class BookmarkList extends React.Component<BookmarkListProps, BookmarkLis
 
     this.operationIsPending = true
     const remove = recurse ? chrome.bookmarks.removeTree : chrome.bookmarks.remove
-    remove(this.state.nodes[this.state.index].id)
-      .then(() => {
-        const msg = "Deleted " + this.state.nodes[this.state.index].title
-        this.props.toasts.current?.addToast({ msg, type: "success" })
-      })
-      .catch((p) => {
-        const msg = this.state.nodes[this.state.index]?.title + " - " + p.message
-        this.props.toasts.current?.addToast({ msg, type: "warning" })
-      })
-      .then(() => this.getChildren(
-        {}, true, () => { this.operationIsPending = false }
-      ))
+    const id = this.state.nodes[this.state.index].id
+    chrome.bookmarks.getSubTree(id)
+      .then((undoInfo) => remove(id)
+        .then(() => {
+          const msg = "Deleted " + this.state.nodes[this.state.index].title
+          this.props.toasts.current?.addToast({ msg, type: "success", undoInfo })
+        })
+        .catch((p) => {
+          const msg = this.state.nodes[this.state.index]?.title + " - " + p.message
+          this.props.toasts.current?.addToast({ msg, type: "warning" })
+        })
+        .then(() => this.getChildren(
+          {}, true, () => { this.operationIsPending = false }
+        ))
+      )
   }
 
   async sort(key: string) {
