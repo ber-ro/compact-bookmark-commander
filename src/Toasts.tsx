@@ -65,7 +65,7 @@ function ToastsComponent(props: ToastsProps, ref: React.Ref<ToastRef>) {
   const UndoButton = (msg: Msg) => {
     if (msg.undoInfo)
       return (
-        <Button size="sm" onClick={() => undo(msg)}>
+        <Button size="sm" className='flex-grow-0 flex-shrink-0 mx-1' onClick={() => undo(msg)}>
           Undo
         </Button>
       )
@@ -78,14 +78,14 @@ function ToastsComponent(props: ToastsProps, ref: React.Ref<ToastRef>) {
       position='bottom-end'>
       {messages.map((msg) => (
         <Toast key={msg.id}
-          bg={msg.type} autohide delay={15000}
-          className={"d-flex m-1" + (msg.type === "success" ? " text-light" : "")}
+          bg={msg.type} autohide delay={10000}
+          className={"m-1" + (msg.type === "success" ? " text-light" : "")}
           onClose={() => removeToast(msg.id)}>
-          <Toast.Body className='d-flex flex-grow-1 justify-content-between align-items-center p-1'>
-            <div className='me-auto'>{msg.msg}</div>
+          <Toast.Body className='d-flex align-items-center p-1'>
+            <div className='flex-grow-1'>{msg.msg}</div>
             {UndoButton(msg)}
             <button type="button"
-              className={"btn-closeme-2 btn-close"
+              className={"btn-closeme-2 btn-close flex-grow-0 flex-shrink-0"
                 + (msg.type === "success" ? " btn-close-white" : "")}
               data-bs-dismiss="toast"
               onClick={() => removeToast(msg.id)} aria-label="Close" />
