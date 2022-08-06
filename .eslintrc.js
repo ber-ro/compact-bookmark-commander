@@ -22,7 +22,6 @@ module.exports = {
     "@typescript-eslint"
   ],
   "rules": {
-    "@typescript-eslint/no-non-null-assertion": "off",
     "@typescript-eslint/ban-types": [
       "error",
       {
@@ -31,6 +30,8 @@ module.exports = {
           "{}": false
         }
       }
-    ]
+    ],
+    "@typescript-eslint/no-explicit-any": "off",
+    "@typescript-eslint/no-non-null-assertion": "off",
   }
 }
