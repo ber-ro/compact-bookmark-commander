@@ -36,7 +36,7 @@ export function CreateFolder({ index, parentId, show, breadcrumbs, resetParentId
         <Modal.Body>
           <Form tabIndex={0} onSubmit={createFolder}>
             <Form.Group>
-              <Form.Label>{breadcrumbs}/</Form.Label>
+              <Form.Label>{breadcrumbs}</Form.Label>
               <Form.Control type="text"
                 autoFocus onFocus={onFocus}
                 value={title} onChange={handleChange} />
