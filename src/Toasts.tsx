@@ -46,10 +46,13 @@ function ToastsComponent(props: ToastsProps, ref: React.Ref<ToastRef>) {
 
     const nodes = msg.undoInfo
     while (nodes.length) {
-      const node = nodes.shift()
+      const node = nodes.shift()!
       try {
-        const created = await chrome.bookmarks.create(CreateDetails(node!))
-        if (!node?.children)
+        const siblings = await chrome.bookmarks.getChildren(node.parentId!)
+        if (node.index! > siblings.length)
+          node.index = siblings.length
+        const created = await chrome.bookmarks.create(CreateDetails(node))
+        if (!node.children)
           continue
 
         for (const i of node.children)
