@@ -31,6 +31,7 @@ function ToastsComponent(props: ToastsProps, ref: React.Ref<ToastRef>) {
 
   const removeToast = (id: number | undefined) => {
     setMessages((messages) => messages.filter((e) => e.id !== id));
+    props.focus()
   }
 
   const CreateDetails = (obj: BookmarkTreeNode) => {
@@ -59,7 +60,6 @@ function ToastsComponent(props: ToastsProps, ref: React.Ref<ToastRef>) {
       }
     }
     removeToast(msg.id)
-    props.focus()
   }
 
   const UndoButton = (msg: Msg) => {
