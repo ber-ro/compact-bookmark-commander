@@ -10,7 +10,7 @@ interface BookmarkProps {
   , onClick: () => void
 }
 
-export class BookmarkItem extends React.Component<BookmarkProps, {}>
+export class BookmarkItem extends React.PureComponent<BookmarkProps, {}>
 {
   ref: HTMLElement | null = null
   constructor(props: BookmarkProps) {
