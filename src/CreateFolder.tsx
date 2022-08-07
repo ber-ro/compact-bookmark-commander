@@ -2,14 +2,16 @@ import React from 'react';
 import { Button, Modal, Form } from 'react-bootstrap';
 
 interface CreateFolderProps {
-  index: number | undefined,
-  parentId: string,
+  index: () => number,
+  parentId: () => string,
   show: boolean,
   breadcrumbs: string,
-  resetParentId: () => void
+  hideCreateFolder: () => void
 }
 
-export function CreateFolder({ index, parentId, show, breadcrumbs, resetParentId }: CreateFolderProps) {
+export const CreateFolder = React.memo(function CreateFolder(
+  { index, parentId, show, breadcrumbs, hideCreateFolder }: CreateFolderProps
+) {
   const [title, setTitle] = React.useState("")
 
   const onFocus = (event: React.FocusEvent<HTMLInputElement>) => {
@@ -18,8 +20,10 @@ export function CreateFolder({ index, parentId, show, breadcrumbs, resetParentId
 
   const createFolder = (event: React.FormEvent) => {
     event.preventDefault()
-    chrome.bookmarks.create({ index, parentId, title })
-      .then(() => resetParentId())
+    chrome.bookmarks.create({
+      index: index() === -1 ? undefined : index(), parentId: parentId(), title
+    })
+      .then(() => hideCreateFolder())
       .catch((e) => { console.log(e) })
   }
 
@@ -29,7 +33,7 @@ export function CreateFolder({ index, parentId, show, breadcrumbs, resetParentId
 
   return (
     <>
-      <Modal show={show} keyboard={true} onHide={() => resetParentId()}>
+      <Modal show={show} keyboard={true} onHide={() => hideCreateFolder()}>
         <Modal.Header>
           <Modal.Title>Create Folder</Modal.Title>
         </Modal.Header>
@@ -44,7 +48,7 @@ export function CreateFolder({ index, parentId, show, breadcrumbs, resetParentId
           </Form>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={() => resetParentId()}>
+          <Button variant="secondary" onClick={() => hideCreateFolder()}>
             Cancel
           </Button>
           <Button type="submit">Submit</Button>
@@ -52,4 +56,4 @@ export function CreateFolder({ index, parentId, show, breadcrumbs, resetParentId
       </Modal>
     </>
   );
-}
+})

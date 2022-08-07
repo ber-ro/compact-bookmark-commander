@@ -6,7 +6,7 @@ type BookmarkTreeNode = chrome.bookmarks.BookmarkTreeNode;
 
 interface BookmarkListState {
   nodes: BookmarkTreeNode[]
-  , ancestors: BookmarkTreeNode[]
+  , breadcrumbs: string
   , index: number
   , showCreateFolder: boolean
 }
@@ -27,11 +27,12 @@ export class BookmarkList extends React.Component<BookmarkListProps, BookmarkLis
   ref: React.RefObject<HTMLDivElement> = React.createRef();
   scrollRef: React.RefObject<HTMLDivElement> = React.createRef();
   operationIsPending = false
+  ancestors: Array<BookmarkTreeNode> = []
   constructor(props: BookmarkListProps) {
     super(props)
     this.state = {
       nodes: []
-      , ancestors: []
+      , breadcrumbs: ""
       , index: 0
       , showCreateFolder: false
     }
@@ -67,7 +68,7 @@ export class BookmarkList extends React.Component<BookmarkListProps, BookmarkLis
   }
 
   onMoved = (id: string, moveInfo: chrome.bookmarks.BookmarkMoveInfo) => {
-    for (const a of this.state.ancestors)
+    for (const a of this.ancestors)
       if (a.id === id) {
         this.getAncestors()
         return
@@ -81,7 +82,7 @@ export class BookmarkList extends React.Component<BookmarkListProps, BookmarkLis
   }
 
   onRemoved = (id: string, removeInfo: chrome.bookmarks.BookmarkRemoveInfo) => {
-    for (const a of this.state.ancestors)
+    for (const a of this.ancestors)
       if (a.id === id) {
         this.getAncestors()
         return
@@ -92,7 +93,7 @@ export class BookmarkList extends React.Component<BookmarkListProps, BookmarkLis
   }
 
   getAncestors = async () => {
-    let ancestors: BookmarkTreeNode[] = []
+    let ancestors = []
     try {
       const key = this.props.side;
       let id = (await chrome.storage.local.get(key))[key] ?? "0"
@@ -106,10 +107,11 @@ export class BookmarkList extends React.Component<BookmarkListProps, BookmarkLis
     } catch (e) {
       ancestors = [{ id: "0", title: "" }]
     }
-    this.getChildren({ ancestors })
+    this.ancestors = ancestors
+    return this.getChildren()
   }
 
-  parentId = (ancestors = this.state.ancestors) => {
+  parentId = (ancestors = this.ancestors) => {
     return ancestors.length
       ? ancestors[ancestors.length - 1].id
       : "0";
@@ -124,17 +126,17 @@ export class BookmarkList extends React.Component<BookmarkListProps, BookmarkLis
     , setState = true
   ): Promise<Partial<BookmarkListState>> => {
     const node = this.state.nodes[this.state.index]
-    state.ancestors ??= this.state.ancestors
     while (!state.nodes)
       try {
         state.nodes = await chrome.bookmarks.getChildren(
-          this.parentId(state.ancestors)
+          this.parentId(this.ancestors)
         )
       } catch (e) {
-        state.ancestors.pop()
+        this.ancestors.pop()
       }
+    state.breadcrumbs = this.ancestors.map((node) => node.title + " /").join(" ");
     chrome.storage.local.set({
-      [this.props.side]: this.parentId(state.ancestors)
+      [this.props.side]: this.parentId(this.ancestors)
     })
     if (state.index === undefined) {
       const index =
@@ -198,7 +200,7 @@ export class BookmarkList extends React.Component<BookmarkListProps, BookmarkLis
     } else if (e.key === "F7") {
       this.setState({ showCreateFolder: true })
     } else if (e.key === "F9") {
-      this.props.other.current?.goto(this.state.ancestors)
+      this.props.other.current?.goto(this.ancestors)
     } else if (e.key === "PageDown") {
       this.scrollRef.current?.scrollBy(0, this.scrollRef.current.clientHeight)
     } else if (e.key === "PageUp") {
@@ -211,7 +213,8 @@ export class BookmarkList extends React.Component<BookmarkListProps, BookmarkLis
   }
 
   goto(ancestors: BookmarkTreeNode[]) {
-    this.getChildren({ ancestors, index: 0 })
+    this.ancestors = ancestors
+    this.getChildren({ index: 0 })
   }
 
   open(node: BookmarkTreeNode) {
@@ -222,16 +225,18 @@ export class BookmarkList extends React.Component<BookmarkListProps, BookmarkLis
       if (node.url.startsWith("http"))
         window.open(node.url)
     } else {
-      this.getChildren({ index: 0, ancestors: [...this.state.ancestors, node] })
+      this.ancestors = [...this.ancestors, node]
+      this.getChildren({ index: 0 })
     }
   }
 
   gotoParent() {
-    if (this.state.ancestors.length <= 1)
+    if (this.ancestors.length <= 1)
       return
 
     const id = this.parentId()
-    this.getChildren({ ancestors: this.state.ancestors.slice(0, -1) }, false)
+    this.ancestors = this.ancestors.slice(0, -1)
+    this.getChildren({}, false)
       .then((state) => {
         const index = state.nodes?.findIndex((node) => node.id === id)
         if (index !== -1 && index !== this.state.index)
@@ -299,7 +304,7 @@ export class BookmarkList extends React.Component<BookmarkListProps, BookmarkLis
   }
 
   move = async (node: BookmarkTreeNode): Promise<void> => {
-    for (const a of this.state.ancestors)
+    for (const a of this.ancestors)
       if (a.id === node.id) {
         this.props.toasts.current?.addToast({
           msg: "Cannot move folder under itself!", type: "warning"
@@ -321,8 +326,11 @@ export class BookmarkList extends React.Component<BookmarkListProps, BookmarkLis
       })
   }
 
+  index = () => {
+    return this.state.index
+  }
+
   render() {
-    const breadcrumbs = this.state.ancestors.map((node) => node.title + " /").join(" ");
     const listItems = this.state.nodes.map((node, index) => {
       return <BookmarkItem node={node}
         isCurrent={index === this.state.index}
@@ -336,19 +344,17 @@ export class BookmarkList extends React.Component<BookmarkListProps, BookmarkLis
       <div className="vstack h-100 p-0 outline bookmarks" ref={this.ref}
         tabIndex={0} onKeyDown={this.onKeyDown}>
         <div className='p-1 bg-secondary text-light bookmark-breadcrumbs'>
-          {breadcrumbs}
+          {this.state.breadcrumbs}
         </div>
         <div className="p-0 overflow-auto" ref={this.scrollRef}>
-          <div className="mb-0 p-0 pane">
-            {listItems}
-          </div>
+          <div className="mb-0 p-0 pane"> {listItems} </div>
         </div>
         <CreateFolder
-          index={this.state.index === -1 ? undefined : this.state.index}
-          parentId={this.parentId()}
+          index={this.index}
+          parentId={this.parentId}
           show={this.state.showCreateFolder}
-          breadcrumbs={breadcrumbs}
-          resetParentId={this.hideCreateFolder} />
+          breadcrumbs={this.state.breadcrumbs}
+          hideCreateFolder={this.hideCreateFolder} />
       </div>
     );
   }
