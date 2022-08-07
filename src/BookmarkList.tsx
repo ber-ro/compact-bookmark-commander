@@ -7,7 +7,6 @@ type BookmarkTreeNode = chrome.bookmarks.BookmarkTreeNode;
 interface BookmarkListState {
   nodes: BookmarkTreeNode[]
   , ancestors: BookmarkTreeNode[]
-  , selected: Set<number>
   , index: number
   , showCreateFolder: boolean
 }
@@ -33,7 +32,6 @@ export class BookmarkList extends React.Component<BookmarkListProps, BookmarkLis
     this.state = {
       nodes: []
       , ancestors: []
-      , selected: new Set()
       , index: 0
       , showCreateFolder: false
     }
@@ -327,7 +325,6 @@ export class BookmarkList extends React.Component<BookmarkListProps, BookmarkLis
     const breadcrumbs = this.state.ancestors.map((node) => node.title + " /").join(" ");
     const listItems = this.state.nodes.map((node, index) => {
       return <BookmarkItem node={node}
-        selected={this.state.selected.has(index)}
         isCurrent={index === this.state.index}
         key={node.id}
         containerRef={this.ref}

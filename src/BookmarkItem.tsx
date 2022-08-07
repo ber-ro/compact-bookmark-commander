@@ -4,7 +4,6 @@ import { Color } from 'react-bootstrap/esm/types';
 
 interface BookmarkProps {
   node: chrome.bookmarks.BookmarkTreeNode
-  , selected?: boolean
   , isCurrent: boolean
   , containerRef: RefObject<HTMLElement>
   , showUrls: boolean
