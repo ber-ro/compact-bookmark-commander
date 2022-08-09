@@ -179,11 +179,9 @@ export class BookmarkList extends React.Component<BookmarkListProps, BookmarkLis
           ? this.state.nodes.length - 1 : this.state.index - 1
       })
     } else if (e.key === "Home") {
-      if (this.state.index !== 0)
-        this.setState({ index: 0 })
+      this.setState({ index: 0 })
     } else if (e.key === "End") {
-      if (this.state.index !== this.state.nodes.length - 1)
-        this.setState({ index: this.state.nodes.length - 1 })
+      this.setState({ index: this.state.nodes.length - 1 })
     } else if (e.key === "Enter" || e.key == "ArrowRight") {
       this.open(this.state.nodes[this.state.index])
     } else if (e.key === "Backspace" || e.key == "ArrowLeft") {
