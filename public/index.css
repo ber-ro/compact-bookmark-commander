@@ -1,6 +1,9 @@
+html {
+  font-size: 12px;
+}
+
 body {
   height: 100vh;
-  --bs-body-font-size: 12px;
   --bs-body-line-height: 1.1;
 }
 

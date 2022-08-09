@@ -4,56 +4,50 @@ import { Button, Modal, Form } from 'react-bootstrap';
 interface CreateFolderProps {
   index: () => number,
   parentId: () => string,
-  show: boolean,
   breadcrumbs: string,
-  hideCreateFolder: () => void
+  hide: () => void
 }
 
-export const CreateFolder = React.memo(function CreateFolder(
-  { index, parentId, show, breadcrumbs, hideCreateFolder }: CreateFolderProps
+export function CreateFolder(
+  { index, parentId, breadcrumbs, hide: hide }: CreateFolderProps
 ) {
   const [title, setTitle] = React.useState("")
-
-  const onFocus = (event: React.FocusEvent<HTMLInputElement>) => {
-    event.target.select()
-  }
+  const titleRef = React.useRef<HTMLInputElement>(null)
 
   const createFolder = (event: React.FormEvent) => {
     event.preventDefault()
     chrome.bookmarks.create({
       index: index() === -1 ? undefined : index(), parentId: parentId(), title
     })
-      .then(() => hideCreateFolder())
+      .then(() => hide())
       .catch((e) => { console.log(e) })
-  }
-
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setTitle(event.target.value);
   }
 
   return (
     <>
-      <Modal show={show} keyboard={true} onHide={() => hideCreateFolder()}>
+      <Modal show={true} keyboard={true} onHide={() => hide()}
+        dialogClassName="w-100 mw-100"
+        onEntered={() => titleRef?.current?.focus()}>
         <Modal.Header>
           <Modal.Title>Create Folder</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <Form tabIndex={0} onSubmit={createFolder}>
+          <p className="lead">{breadcrumbs}</p>
+          <Form tabIndex={0} onSubmit={createFolder} id="CreateFolder">
             <Form.Group>
-              <Form.Label>{breadcrumbs}</Form.Label>
               <Form.Control type="text"
-                autoFocus onFocus={onFocus}
-                value={title} onChange={handleChange} />
+                ref={titleRef}
+                value={title} onChange={(e) => { setTitle(e.target.value) }} />
             </Form.Group>
           </Form>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={() => hideCreateFolder()}>
+          <Button variant="secondary" onClick={() => hide()}>
             Cancel
           </Button>
-          <Button type="submit">Submit</Button>
+          <Button type="submit" form="CreateFolder">Submit</Button>
         </Modal.Footer>
       </Modal>
     </>
   );
-})
+}

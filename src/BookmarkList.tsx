@@ -1,6 +1,7 @@
 import React, { RefObject } from 'react';
 import { BookmarkItem } from './BookmarkItem';
 import { CreateFolder } from './CreateFolder'
+import { Edit } from './Edit';
 import { ToastRef } from './Toasts';
 type BookmarkTreeNode = chrome.bookmarks.BookmarkTreeNode;
 
@@ -9,6 +10,7 @@ interface BookmarkListState {
   , breadcrumbs: string
   , index: number
   , showCreateFolder: boolean
+  , showEdit: boolean
 }
 
 interface BookmarkListProps {
@@ -35,6 +37,7 @@ export class BookmarkList extends React.Component<BookmarkListProps, BookmarkLis
       , breadcrumbs: ""
       , index: 0
       , showCreateFolder: false
+      , showEdit: false
     }
   }
 
@@ -121,6 +124,10 @@ export class BookmarkList extends React.Component<BookmarkListProps, BookmarkLis
     this.getChildren({ showCreateFolder: false })
   }
 
+  hideEdit = () => {
+    this.getChildren({ showEdit: false })
+  }
+
   getChildren = async (
     state: Partial<BookmarkListState> = {}
     , setState = true
@@ -157,7 +164,7 @@ export class BookmarkList extends React.Component<BookmarkListProps, BookmarkLis
   }
 
   onKeyDown = (e: React.KeyboardEvent) => {
-    if (this.state.showCreateFolder)
+    if (this.state.showCreateFolder || this.state.showEdit)
       return;
 
     // console.log(e.key);
@@ -183,6 +190,9 @@ export class BookmarkList extends React.Component<BookmarkListProps, BookmarkLis
       this.gotoParent()
     } else if (e.key === "Delete") {
       this.delete(e.shiftKey)
+    } else if (e.key === "F2") {
+      if (this.state.index >= 0)
+        this.setState({ showEdit: true })
     } else if (e.key === "F5") {
       this.sort(e.shiftKey ? "title" : "url")
     } else if (e.key === "F6") {
@@ -340,6 +350,7 @@ export class BookmarkList extends React.Component<BookmarkListProps, BookmarkLis
         onClick={this.onClick(index)}
       />
     });
+    const node = this.state.nodes[this.state.index]
     return (
       <div className="vstack h-100 p-0 outline bookmarks" ref={this.ref}
         tabIndex={0} onKeyDown={this.onKeyDown}>
@@ -349,12 +360,21 @@ export class BookmarkList extends React.Component<BookmarkListProps, BookmarkLis
         <div className="p-0 overflow-auto" ref={this.scrollRef}>
           <div className="mb-0 p-0 pane"> {listItems} </div>
         </div>
-        <CreateFolder
-          index={this.index}
-          parentId={this.parentId}
-          show={this.state.showCreateFolder}
-          breadcrumbs={this.state.breadcrumbs}
-          hideCreateFolder={this.hideCreateFolder} />
+        {this.state.showCreateFolder && (
+          <CreateFolder
+            index={this.index}
+            parentId={this.parentId}
+            breadcrumbs={this.state.breadcrumbs}
+            hide={this.hideCreateFolder} />
+        )}
+        {this.state.showEdit && node && (
+          <Edit
+            id={node.id}
+            title={node.title}
+            url={node.url}
+            breadcrumbs={this.state.breadcrumbs}
+            hide={this.hideEdit} />
+        )}
       </div>
     );
   }

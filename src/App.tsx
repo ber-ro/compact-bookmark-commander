@@ -46,6 +46,7 @@ class App extends React.Component<{}, AppState> {
       , ["Up/Down", "...", "Up/Down"]
       , ["Enter, Right", "Open...", "Open Folder\nOpen Bookmark in new Window/Tab"]
       , ["Backspace, Left", "Parent...", "Goto Parent Folder"]
+      , ["F2", "Edit...", "Edit Bookmark/Folder"]
       , ["F3", "Toggle URLs"]
       , ["F5", "Sort...", "Sort by URL\nShift: Sort by Title"]
       , ["F6", "Move"]
