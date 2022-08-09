@@ -6,6 +6,7 @@ A bookmark commander/manager for Google Chrome™. Bookmarks are displayed side 
 - Move
 - Delete
 - Create Folder
+- Edit Folder/Link Name/URL
 - Sort
 - Toggle URLs
 - Goto same Folder in other Pane
@@ -15,6 +16,3 @@ A bookmark commander/manager for Google Chrome™. Bookmarks are displayed side 
 
 ### Hidden URLs
 ![Screenshot without URLs](/images/screenshot-no-URLs.png)
-
-### Todo
-- Edit Folder/Link Name/URL
