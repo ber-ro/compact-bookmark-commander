@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { BookmarkList } from './BookmarkList';
 import { ToastRef, Toasts } from './Toasts';
-import { Container, Row, Col } from 'react-bootstrap';
+import { Col, Container, OverlayTrigger, Row, Tooltip } from 'react-bootstrap';
 
 interface AppState {
   showUrls: boolean
@@ -40,7 +40,7 @@ class App extends React.Component<{}, AppState> {
   }
 
   render() {
-    const buttons = [
+    const keys = [
       ["Tab", "...", "Left/Right"]
       , ["Del", "...", "Delete\nShift: Delete recursive"]
       , ["Up/Down", "...", "Up/Down"]
@@ -71,19 +71,31 @@ class App extends React.Component<{}, AppState> {
         </Row>
         <Row className='help bg-light'>
           <div className='p-0 text-truncate'>
-            {buttons.map((text) => (
-              <span key={text[0]} title={text[2]} className='me-2 bm-key-definition'>
-                <span className="px-1 ms-0 me-1 bm-key" >{text[0]}</span>
-                <span className="me-1">{text[1]}</span>
-              </span>
-            ))}
+            {keys.map(keyboardHint)}
           </div>
         </Row>
-        <Toasts ref={this.toasts} focus={this.focus}/>
+        <Toasts ref={this.toasts} focus={this.focus} />
       </Container>
     );
   }
 }
+
+const keyboardHint = (item: string[]) => (
+  <OverlayTrigger
+    key={item[0]}
+    placement={'top'}
+    overlay={
+      item[2]
+        ? <Tooltip>{item[2]}</Tooltip>
+        : <></>
+    }
+  >
+    <span className='me-2 bm-key-definition'>
+      <span className="px-1 ms-0 me-1 bm-key">{item[0]}</span>
+      <span className="me-1">{item[1]}</span>
+    </span>
+  </OverlayTrigger>
+)
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
