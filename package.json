@@ -1,17 +1,19 @@
 {
   "scripts": {
-    "precreate":"npm run build",
-    "create":"cd prod && powershell Compress-Archive -force * chrome.zip",
+    "precreate": "npm run build",
+    "create": "cd prod && powershell Compress-Archive -force * chrome.zip",
     "build": "babel src --extensions .tsx --out-dir prod/app && node build.mjs",
     "build:dev": "babel src --extensions .tsx --out-dir dev/app && node build.mjs --dev"
   },
-  "babel":{
+  "babel": {
     "presets": [
       "@babel/preset-env",
       "@babel/preset-react",
       "@babel/preset-typescript"
     ],
-    "plugins": [ "@babel/plugin-transform-modules-amd" ],
+    "plugins": [
+      "@babel/plugin-transform-modules-amd"
+    ],
     "targets": "last 2 Chrome versions"
   },
   "dependencies": {
@@ -34,5 +36,5 @@
     "react-dom": "^18.1.0",
     "requirejs": "^2.3.6"
   },
-  "license":"MIT"
+  "license": "MIT"
 }
