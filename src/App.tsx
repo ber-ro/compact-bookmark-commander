@@ -86,7 +86,7 @@ const keyboardHint = (item: string[]) => (
     placement={'top'}
     overlay={
       item[2]
-        ? <Tooltip>{item[2]}</Tooltip>
+        ? <Tooltip className='position-fixed'>{item[2]}</Tooltip>
         : <></>
     }
   >
