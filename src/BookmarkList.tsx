@@ -3,6 +3,8 @@ import { BookmarkItem } from './BookmarkItem';
 import { CreateFolder } from './CreateFolder'
 import { Edit } from './Edit';
 import { ToastRef } from './Toasts';
+import { config } from './Options'
+
 type BookmarkTreeNode = chrome.bookmarks.BookmarkTreeNode;
 
 interface BookmarkListState {
@@ -22,6 +24,27 @@ interface BookmarkListProps {
 
 function removeProtocol(url: string) {
   return url?.replace(/[^:]*:\/*(www\.)?/i, "")
+}
+
+const compareFunc = () =>
+  config["Sort By Title"].val ? compareTitle : compareUrl
+
+const compareUrl = (a: BookmarkTreeNode, b: BookmarkTreeNode) => {
+  const u1 = removeProtocol(a.url || "")
+  const u2 = removeProtocol(b.url || "")
+  return u1.localeCompare(u2) || a.title.localeCompare(b.title)
+}
+
+const compareTitle = (a: BookmarkTreeNode, b: BookmarkTreeNode) => {
+  return (
+    !a.url && !b.url
+      ? a.title.localeCompare(b.title)
+      : !a.url
+        ? -1
+        : !b.url
+          ? 1
+          : a.title.localeCompare(b.title)
+  )
 }
 
 export class BookmarkList extends React.Component<BookmarkListProps, BookmarkListState>
@@ -192,7 +215,7 @@ export class BookmarkList extends React.Component<BookmarkListProps, BookmarkLis
       if (this.state.index >= 0)
         this.setState({ showEdit: true })
     } else if (e.key === "F5") {
-      this.sort(e.shiftKey ? "title" : "url")
+      this.sort()
     } else if (e.key === "F6") {
       const node = this.state.nodes[this.state.index]
       if (node && !this.operationIsPending) {
@@ -279,26 +302,9 @@ export class BookmarkList extends React.Component<BookmarkListProps, BookmarkLis
     }
   }
 
-  async sort(key: string) {
+  async sort() {
     const nodes = [...this.state.nodes]
-    const compare = key === "url"
-      ? (a: BookmarkTreeNode, b: BookmarkTreeNode): number => {
-        const u1 = removeProtocol(a.url || "")
-        const u2 = removeProtocol(b.url || "")
-        return u1.localeCompare(u2) || a.title.localeCompare(b.title)
-      }
-      : (a: BookmarkTreeNode, b: BookmarkTreeNode): number => {
-        return (
-          !a.url && !b.url
-            ? a.title.localeCompare(b.title)
-            : !a.url
-              ? -1
-              : !b.url
-                ? 1
-                : a.title.localeCompare(b.title)
-        )
-      }
-    nodes.sort(compare)
+    nodes.sort(compareFunc())
 
     chrome.bookmarks.onMoved.removeListener(this.onMoved)
     for (let i = 0; i < nodes.length; i++)
@@ -311,6 +317,16 @@ export class BookmarkList extends React.Component<BookmarkListProps, BookmarkLis
     this.ref.current?.focus();
   }
 
+  getIndexSorted = (node: chrome.bookmarks.BookmarkTreeNode) => {
+    const nodes = this.state.nodes
+    const compare = compareFunc()
+    for (let i = 0; i < nodes.length; i++) {
+      if (compare(nodes[i], node) > 0)
+        return i
+    }
+    return nodes.length
+  }
+
   move = async (node: BookmarkTreeNode): Promise<void> => {
     for (const a of this.ancestors)
       if (a.id === node.id) {
@@ -320,7 +336,9 @@ export class BookmarkList extends React.Component<BookmarkListProps, BookmarkLis
         return Promise.resolve()
       }
 
-    let index = this.state.index
+    let index = config["Move Sorted"]
+      ? this.getIndexSorted(node)
+      : this.state.index
     if (index === -1)
       index = this.state.nodes.length
 
@@ -349,6 +367,7 @@ export class BookmarkList extends React.Component<BookmarkListProps, BookmarkLis
       />
     });
     const node = this.state.nodes[this.state.index]
+
     return (
       <div className="vstack h-100 p-0 outline bookmarks" ref={this.ref}
         tabIndex={0} onKeyDown={this.onKeyDown}>

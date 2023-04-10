@@ -1,8 +1,9 @@
+import { BookmarkList } from './BookmarkList';
+import { Col, Container, OverlayTrigger, Row, Tooltip } from 'react-bootstrap';
+import { Options } from './Options';
+import { ToastRef, Toasts } from './Toasts';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { BookmarkList } from './BookmarkList';
-import { ToastRef, Toasts } from './Toasts';
-import { Col, Container, OverlayTrigger, Row, Tooltip } from 'react-bootstrap';
 
 interface AppState {
   showUrls: boolean
@@ -48,7 +49,7 @@ class App extends React.Component<{}, AppState> {
       , ["Backspace, Left", "Parent...", "Goto Parent Folder"]
       , ["F2", "Edit...", "Edit Bookmark/Folder"]
       , ["F3", "Toggle URLs"]
-      , ["F5", "Sort...", "Sort by URL\nShift: Sort by Title"]
+      , ["F5", "Sort"]
       , ["F6", "Move"]
       , ["F7", "+ Folder...", "Create Folder"]
       , ["F9", "Same...", "Goto same Folder in other Pane"]
@@ -71,6 +72,7 @@ class App extends React.Component<{}, AppState> {
         </Row>
         <Row className='help bg-light'>
           <div className='p-0 text-truncate'>
+            <Options/>
             {keys.map(keyboardHint)}
           </div>
         </Row>
