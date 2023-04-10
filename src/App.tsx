@@ -90,7 +90,7 @@ const keyboardHint = (item: string[]) => (
         : <></>
     }
   >
-    <span className='me-2 bm-key-definition'>
+    <span key={item[0]} className='me-2 bm-key-definition'>
       <span className="px-1 ms-0 me-1 bm-key">{item[0]}</span>
       <span className="me-1">{item[1]}</span>
     </span>
