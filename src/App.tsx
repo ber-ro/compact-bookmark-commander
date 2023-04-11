@@ -1,5 +1,6 @@
 import { BookmarkList } from './BookmarkList';
-import { Col, Container, OverlayTrigger, Row, Tooltip } from 'react-bootstrap';
+import { Col, Container, Row } from 'react-bootstrap';
+import { CBCTooltip } from './Util';
 import { Options } from './Options';
 import { ToastRef, Toasts } from './Toasts';
 import React from 'react';
@@ -72,7 +73,7 @@ class App extends React.Component<{}, AppState> {
         </Row>
         <Row className='help bg-light'>
           <div className='p-0 text-truncate'>
-            <Options/>
+            <Options />
             {keys.map(keyboardHint)}
           </div>
         </Row>
@@ -83,20 +84,12 @@ class App extends React.Component<{}, AppState> {
 }
 
 const keyboardHint = (item: string[]) => (
-  <OverlayTrigger
-    key={item[0]}
-    placement={'top'}
-    overlay={
-      item[2]
-        ? <Tooltip className='position-fixed'>{item[2]}</Tooltip>
-        : <></>
-    }
-  >
+  <CBCTooltip key={item[0]} text={item[2]}>
     <span key={item[0]} className='me-2 bm-key-definition'>
       <span className="px-1 ms-0 me-1 bm-key">{item[0]}</span>
       <span className="me-1">{item[1]}</span>
     </span>
-  </OverlayTrigger>
+  </CBCTooltip>
 )
 
 const root = ReactDOM.createRoot(

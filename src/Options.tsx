@@ -1,4 +1,4 @@
-import { OverlayTrigger, Tooltip } from 'react-bootstrap';
+import { CBCTooltip } from './Util';
 import React from 'react';
 
 export const config = {
@@ -14,43 +14,35 @@ export const config = {
 type Config = keyof typeof config
 
 interface OptionProps {
-  label: Config
+  title: Config
 }
 
-export function Option({ label }: OptionProps) {
+export function Option({ title }: OptionProps) {
   const [get, set] = React.useState(false)
 
-  chrome.storage.local.get(label).then((result) => {
-    if (typeof result[label] !== 'undefined')
-      set(result[label])
+  chrome.storage.local.get(title).then((result) => {
+    if (typeof result[title] !== 'undefined')
+      set(result[title])
   })
 
   const handleChange = () => {
     const val = !get
-    config[label].val = val
+    config[title].val = val
     set(val)
-    chrome.storage.local.set({ [label]: val })
+    chrome.storage.local.set({ [title]: val })
   }
 
   return (
-    <OverlayTrigger
-      key={label}
-      placement={'top'}
-      overlay={
-        label
-          ? <Tooltip className='position-fixed'>{label}</Tooltip>
-          : <></>
-      }
-    >
-      <label key={label} className='me-2'>
+    <CBCTooltip text={title}>
+      <label key={title} className='me-2'>
         <input
           type="checkbox"
           checked={get}
           onChange={handleChange}
         />
-        <span className='align-top'>{config[label].abbr}</span>
+        <span className='align-top'>{config[title].abbr}</span>
       </label>
-    </OverlayTrigger>
+    </CBCTooltip>
   );
 }
 
@@ -59,7 +51,7 @@ export function Options(
   return (
     <>
       {Object.keys(config).map((key) => (
-        <Option key={key} label={key as Config} />
+        <Option key={key} title={key as Config} />
       ))}
     </>
   );
