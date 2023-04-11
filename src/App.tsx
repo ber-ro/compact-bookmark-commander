@@ -42,20 +42,6 @@ class App extends React.Component<{}, AppState> {
   }
 
   render() {
-    const keys = [
-      ["Tab", "...", "Left/Right"]
-      , ["Del", "...", "Delete\nShift: Delete recursive"]
-      , ["Up/Down", "...", "Up/Down"]
-      , ["Enter, Right", "Open...", "Open Folder\nOpen Bookmark in new Window/Tab"]
-      , ["Backspace, Left", "Parent...", "Goto Parent Folder"]
-      , ["F2", "Edit...", "Edit Bookmark/Folder"]
-      , ["F3", "Toggle URLs"]
-      , ["F5", "Sort"]
-      , ["F6", "Move"]
-      , ["F7", "+ Folder...", "Create Folder"]
-      , ["F9", "Same...", "Goto same Folder in other Pane"]
-    ]
-
     return (
       <Container className="App" fluid onKeyDown={this.onKeyDown} tabIndex={0}>
         <Row className='panes'>
@@ -74,7 +60,7 @@ class App extends React.Component<{}, AppState> {
         <Row className='help bg-light'>
           <div className='p-0 text-truncate'>
             <Options />
-            {keys.map(keyboardHint)}
+            <KeyboardHints />
           </div>
         </Row>
         <Toasts ref={this.toasts} focus={this.focus} />
@@ -83,14 +69,32 @@ class App extends React.Component<{}, AppState> {
   }
 }
 
-const keyboardHint = (item: string[]) => (
-  <CBCTooltip key={item[0]} text={item[2]}>
-    <span key={item[0]} className='me-2 bm-key-definition'>
-      <span className="px-1 ms-0 me-1 bm-key">{item[0]}</span>
-      <span className="me-1">{item[1]}</span>
-    </span>
-  </CBCTooltip>
-)
+const KeyboardHints = () => {
+  const keys = [
+    ["Tab", "...", "Left/Right"]
+    , ["Del", "...", "Delete\nShift: Delete recursive"]
+    , ["Up/Down", "...", "Up/Down"]
+    , ["Enter, Right", "Open...", "Open Folder\nOpen Bookmark in new Window/Tab"]
+    , ["Backspace, Left", "Parent...", "Goto Parent Folder"]
+    , ["F2", "Edit...", "Edit Bookmark/Folder"]
+    , ["F3", "Toggle URLs"]
+    , ["F5", "Sort"]
+    , ["F6", "Move"]
+    , ["F7", "+ Folder...", "Create Folder"]
+    , ["F9", "Same...", "Goto same Folder in other Pane"]
+  ]
+
+  const keyboardHint = ([key, text, additional]: string[]) => (
+    <CBCTooltip key={key} text={additional}>
+      <span key={key} className='me-2 bm-key-definition'>
+        <span className="px-1 ms-0 me-1 bm-key">{key}</span>
+        <span className="me-1">{text}</span>
+      </span>
+    </CBCTooltip>
+  )
+
+  return <>{keys.map(keyboardHint)}</>
+}
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
