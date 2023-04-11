@@ -2,7 +2,7 @@ import React from 'react';
 import { Button, Modal, Form } from 'react-bootstrap';
 
 interface CreateFolderProps {
-  index: () => number,
+  index: (a: chrome.bookmarks.BookmarkTreeNode) => number | undefined,
   parentId: () => string,
   breadcrumbs: string,
   hide: () => void
@@ -17,7 +17,7 @@ export function CreateFolder(
   const createFolder = (event: React.FormEvent) => {
     event.preventDefault()
     chrome.bookmarks.create({
-      index: index() === -1 ? undefined : index(), parentId: parentId(), title
+      index: index({ title } as chrome.bookmarks.BookmarkTreeNode), parentId: parentId(), title
     })
       .then(() => hide())
       .catch((e) => { console.log(e) })

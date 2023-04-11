@@ -6,9 +6,9 @@ export const config = {
     val: false,
     abbr: "st"
   },
-  "Move Sorted": {
+  "Keep Sorted": {
     val: false,
-    abbr: "ms"
+    abbr: "ks"
   }
 }
 type Config = keyof typeof config
@@ -20,15 +20,18 @@ interface OptionProps {
 export function Option({ title }: OptionProps) {
   const [get, set] = React.useState(false)
 
+  const setAll = (val: boolean) => {
+    config[title].val = val
+    set(val)
+  }
+  
   chrome.storage.local.get(title).then((result) => {
-    if (typeof result[title] !== 'undefined')
-      set(result[title])
+    setAll(result[title])
   })
 
   const handleChange = () => {
     const val = !get
-    config[title].val = val
-    set(val)
+    setAll(val)
     chrome.storage.local.set({ [title]: val })
   }
 

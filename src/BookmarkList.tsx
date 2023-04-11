@@ -318,16 +318,6 @@ export class BookmarkList extends React.Component<BookmarkListProps, BookmarkLis
     this.ref.current?.focus();
   }
 
-  getIndexSorted = (node: chrome.bookmarks.BookmarkTreeNode) => {
-    const nodes = this.state.nodes
-    const compare = compareFunc()
-    for (let i = 0; i < nodes.length; i++) {
-      if (compare(nodes[i], node) > 0)
-        return i
-    }
-    return nodes.length
-  }
-
   move = async (node: BookmarkTreeNode): Promise<void> => {
     for (const a of this.ancestors)
       if (a.id === node.id) {
@@ -337,13 +327,7 @@ export class BookmarkList extends React.Component<BookmarkListProps, BookmarkLis
         return Promise.resolve()
       }
 
-    let index = config["Move Sorted"]
-      ? this.getIndexSorted(node)
-      : this.state.index
-    if (index === -1)
-      index = this.state.nodes.length
-
-    return chrome.bookmarks.move(node.id, { parentId: this.parentId(), index })
+    return chrome.bookmarks.move(node.id, { parentId: this.parentId(), index: this.index(node) })
       .then(() => {
         const msg = "Moved " + node.title
         this.props.toasts.current?.addToast({ msg, type: "success" })
@@ -353,8 +337,22 @@ export class BookmarkList extends React.Component<BookmarkListProps, BookmarkLis
       })
   }
 
-  index = () => {
-    return this.state.index
+  getIndexSorted = (node: BookmarkTreeNode) => {
+    const nodes = this.state.nodes
+    const compare = compareFunc()
+    for (let i = 0; i < nodes.length; i++) {
+      if (compare(nodes[i], node) > 0)
+        return i
+    }
+    return nodes.length
+  }
+
+  index = (node: BookmarkTreeNode): number | undefined => {
+    return config["Keep Sorted"].val
+      ? this.getIndexSorted(node)
+      : this.state.index === -1
+        ? undefined
+        : this.state.index
   }
 
   render() {
