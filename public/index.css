@@ -68,3 +68,8 @@ div.pane-container {
   background-color: slategray;
   color: white;
 }
+
+.tooltip > .tooltip-inner {
+  white-space: pre-line;
+  text-align: left;
+}
