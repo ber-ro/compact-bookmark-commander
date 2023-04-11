@@ -22,20 +22,21 @@ interface BookmarkListProps {
   , showUrls: boolean
 }
 
-function removeProtocol(url: string) {
-  return url?.replace(/[^:]*:\/*(www\.)?/i, "")
+function normalizeUrl(url: string) {
+  return url?.replace(/(http|ftp)s?:\/*(www\.)?/i, "$1://")
 }
 
 const compareFunc = () =>
   config["Sort By Title"].val ? compareTitle : compareUrl
 
 const compareUrl = (a: BookmarkTreeNode, b: BookmarkTreeNode) => {
-  const u1 = removeProtocol(a.url || "")
-  const u2 = removeProtocol(b.url || "")
+  const u1 = normalizeUrl(a.url || "")
+  const u2 = normalizeUrl(b.url || "")
   return u1.localeCompare(u2) || a.title.localeCompare(b.title)
 }
 
 const compareTitle = (a: BookmarkTreeNode, b: BookmarkTreeNode) => {
+  // node is a folder if url is missing
   return (
     !a.url && !b.url
       ? a.title.localeCompare(b.title)
