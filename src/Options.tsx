@@ -24,10 +24,12 @@ export function Option({ title }: OptionProps) {
     config[title].val = val
     set(val)
   }
-  
-  chrome.storage.local.get(title).then((result) => {
-    setAll(result[title])
-  })
+
+  React.useEffect(() => {
+    chrome.storage.local.get(title).then((result) => {
+      setAll(result[title])
+    })
+  }, []);
 
   const handleChange = () => {
     const val = !get
