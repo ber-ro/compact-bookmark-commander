@@ -1,20 +1,13 @@
 import { CBCTooltip } from './Util';
 import React from 'react';
 
-export const config = {
-  "Sort By Title": {
-    val: false,
-    abbr: "st"
-  },
-  "Keep Sorted": {
-    val: false,
-    abbr: "ks"
-  }
-}
-type Config = keyof typeof config
+export const config = Object.fromEntries([
+  ["Sort By Title", "st"],
+  ["Keep Sorted", "ks"]
+].map(([key, val]) => ([[key], { abbr: val, val: undefined }])))
 
 interface OptionProps {
-  title: Config
+  title: string
 }
 
 export function Option({ title }: OptionProps) {
@@ -56,7 +49,7 @@ export function Options(
   return (
     <>
       {Object.keys(config).map((key) => (
-        <Option key={key} title={key as Config} />
+        <Option key={key} title={key} />
       ))}
     </>
   );
