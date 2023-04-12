@@ -3,8 +3,8 @@ import React from 'react';
 
 export const config = Object.fromEntries([
   ["Sort By Title", "st"],
-  ["Keep Sorted", "ks"]
-].map(([key, val]) => ([[key], { abbr: val, val: undefined }])))
+  ["Keep Sorted", "ks", "Keep Sorted after Move/Create Folder"]
+].map(([key, abbr, text]) => ([[key], { abbr, text, val: undefined }])))
 
 interface OptionProps {
   title: string
@@ -18,7 +18,7 @@ export function Option({ title }: OptionProps) {
     set(val)
   }
 
-  React.useEffect(() => {
+  React.useEffect(() => { // run only once
     chrome.storage.local.get(title).then((result) => {
       setAll(result[title])
     })
@@ -31,7 +31,7 @@ export function Option({ title }: OptionProps) {
   }
 
   return (
-    <CBCTooltip text={title}>
+    <CBCTooltip text={config[title].text || title}>
       <label key={title} className='me-2'>
         <input
           type="checkbox"
