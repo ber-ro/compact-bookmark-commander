@@ -9,7 +9,7 @@ interface CreateFolderProps {
 }
 
 export function CreateFolder(
-  { index, parentId, breadcrumbs, hide: hide }: CreateFolderProps
+  { index, parentId, breadcrumbs, hide }: CreateFolderProps
 ) {
   const [title, setTitle] = React.useState("")
   const titleRef = React.useRef<HTMLInputElement>(null)

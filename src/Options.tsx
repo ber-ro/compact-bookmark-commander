@@ -12,17 +12,19 @@ interface OptionProps {
 
 export function Option({ title }: OptionProps) {
   const [get, set] = React.useState(false)
+  const initialized = React.useRef<boolean>()
+
+  if (initialized.current === undefined) {
+    initialized.current = true
+    chrome.storage.local.get(title).then((result) => {
+      setAll(result[title])
+    })
+  }
 
   const setAll = (val: boolean) => {
     config[title].val = val
     set(val)
   }
-
-  React.useEffect(() => { // run only once
-    chrome.storage.local.get(title).then((result) => {
-      setAll(result[title])
-    })
-  }, []);
 
   const handleChange = () => {
     const val = !get

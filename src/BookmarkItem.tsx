@@ -55,7 +55,7 @@ export class BookmarkItem extends React.PureComponent<BookmarkProps, {}>
 
     const domain = Url.protocol + "//" + Url.hostname
     return (
-      <img width='16' height='16'
+      <img width='16' height='16' alt=""
         src={'https://www.google.com/s2/favicons?domain=' + domain}
       />
     )
