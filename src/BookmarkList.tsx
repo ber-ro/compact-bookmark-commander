@@ -10,7 +10,7 @@ type BookmarkTreeNode = chrome.bookmarks.BookmarkTreeNode;
 interface BookmarkListState {
   nodes: BookmarkTreeNode[]
   , breadcrumbs: string
-  , index: number
+  , index: number | undefined
   , showCreateFolder: boolean
   , showEdit: boolean
 }
@@ -91,7 +91,7 @@ export class BookmarkList extends React.Component<BookmarkListProps, BookmarkLis
 
   onCreated = (id: string, bookmark: BookmarkTreeNode) => {
     if (bookmark.parentId === this.parentId())
-      this.getChildren()
+      this.getChildren({ id: bookmark.id })
   }
 
   onMoved = (id: string, moveInfo: chrome.bookmarks.BookmarkMoveInfo) => {
@@ -101,10 +101,8 @@ export class BookmarkList extends React.Component<BookmarkListProps, BookmarkLis
         return
       }
 
-    if (
-      this.parentId() === moveInfo.parentId ||
-      this.parentId() === moveInfo.oldParentId
-    )
+    const parent = this.parentId()
+    if (parent === moveInfo.parentId || parent === moveInfo.oldParentId)
       this.getChildren()
   }
 
@@ -153,10 +151,10 @@ export class BookmarkList extends React.Component<BookmarkListProps, BookmarkLis
   }
 
   getChildren = async (
-    state: Partial<BookmarkListState> = {}
+    state: Partial<BookmarkListState & { id: string }> = {}
     , setState = true
   ): Promise<Partial<BookmarkListState>> => {
-    const node = this.state.nodes[this.state.index]
+    const node = this.current()
     while (!state.nodes)
       try {
         state.nodes = await chrome.bookmarks.getChildren(
@@ -165,17 +163,16 @@ export class BookmarkList extends React.Component<BookmarkListProps, BookmarkLis
       } catch (e) {
         this.ancestors.pop()
       }
-    state.breadcrumbs = this.ancestors.map((node) => node.title + " /").join(" ");
+    state.breadcrumbs = this.ancestors.map((n) => n.title + " /").join(" ");
     chrome.storage.local.set({
       [this.props.side]: this.parentId(this.ancestors)
     })
-    if (state.index === undefined) {
-      const index =
-        node ? state.nodes.findIndex((node2) => node2.id === node.id) : -1
+    if (state.index === undefined && state.showCreateFolder === undefined) {
+      const index = node
+        ? state.nodes.findIndex((n) => n.id === (state.id ?? node.id))
+        : -1
       state.index = index === -1 ? this.state.index : index
     }
-    if (state.index >= state.nodes.length)
-      state.index = state.nodes.length - 1
     if (setState)
       return new Promise((resolve) => {
         this.setState(state as BookmarkListState, () => resolve(state))
@@ -193,42 +190,26 @@ export class BookmarkList extends React.Component<BookmarkListProps, BookmarkLis
 
     // console.log(e.key);
     if (e.key === "ArrowDown") {
-      this.setState({
-        index: this.state.index === this.state.nodes.length - 1
-          ? -1 : this.state.index + 1
-      })
+      this.prevNextItem(+1)
     } else if (e.key === "ArrowUp") {
-      this.setState({
-        index: this.state.index === - 1
-          ? this.state.nodes.length - 1 : this.state.index - 1
-      })
+      this.prevNextItem(-1)
     } else if (e.key === "Home") {
       this.setState({ index: 0 })
     } else if (e.key === "End") {
       this.setState({ index: this.state.nodes.length - 1 })
-    } else if (e.key === "Enter" || e.key == "ArrowRight") {
-      this.open(this.state.nodes[this.state.index])
-    } else if (e.key === "Backspace" || e.key == "ArrowLeft") {
+    } else if (e.key === "Enter" || e.key === "ArrowRight") {
+      this.open(this.current())
+    } else if (e.key === "Backspace" || e.key === "ArrowLeft") {
       this.gotoParent()
     } else if (e.key === "Delete") {
       this.delete(e.shiftKey)
     } else if (e.key === "F2") {
-      if (this.state.index >= 0)
+      if (this.current())
         this.setState({ showEdit: true })
     } else if (e.key === "F5") {
       this.sort()
     } else if (e.key === "F6") {
-      const node = this.state.nodes[this.state.index]
-      if (node && !this.operationIsPending) {
-        this.operationIsPending = true
-        chrome.bookmarks.onMoved.removeListener(this.onMoved)
-        this.props.other.current?.move(node)
-          .finally(() => this.getChildren())
-          .finally(() => {
-            chrome.bookmarks.onMoved.addListener(this.onMoved)
-            this.operationIsPending = false
-          })
-      }
+      this.move()
     } else if (e.key === "F7") {
       this.setState({ showCreateFolder: true })
     } else if (e.key === "F9") {
@@ -244,12 +225,25 @@ export class BookmarkList extends React.Component<BookmarkListProps, BookmarkLis
     e.preventDefault()
   }
 
+  prevNextItem = (dir: number) => {
+    let idx = this.state.index
+    const len = this.state.nodes.length
+    if (idx === undefined)
+      idx = len
+    idx = idx + dir
+    if (idx === -1 || idx === len)
+      idx = undefined
+    else if (idx > len)
+      idx = 0
+    this.setState({ index: idx })
+  }
+
   goto(ancestors: BookmarkTreeNode[]) {
     this.ancestors = ancestors
     this.getChildren({ index: 0 })
   }
 
-  open(node: BookmarkTreeNode) {
+  open(node: BookmarkTreeNode | undefined) {
     if (!node)
       return
 
@@ -271,27 +265,28 @@ export class BookmarkList extends React.Component<BookmarkListProps, BookmarkLis
     this.getChildren({}, false)
       .then((state) => {
         const index = state.nodes?.findIndex((node) => node.id === id)
-        if (index !== -1 && index !== this.state.index)
+        if (index !== -1)
           state.index = index
         this.setState(state as BookmarkListState)
       })
   }
 
   async delete(recurse: boolean) {
-    if (this.state.index < 0 || this.operationIsPending)
+    const current = this.current()
+    if (!current || this.operationIsPending)
       return
 
     this.operationIsPending = true
     chrome.bookmarks.onRemoved.removeListener(this.onRemoved)
     const remove = recurse ? chrome.bookmarks.removeTree : chrome.bookmarks.remove
-    const id = this.state.nodes[this.state.index].id
+    const id = current.id
     try {
       const undoInfo = await chrome.bookmarks.getSubTree(id)
       await remove(id)
-      const msg = "Deleted " + this.state.nodes[this.state.index].title
+      const msg = "Deleted " + current.title
       this.props.toasts.current?.addToast({ msg, type: "success", undoInfo })
     } catch (p: any) {
-      const msg = this.state.nodes[this.state.index]?.title + " - " + p.message
+      const msg = current.title + " - " + p.message
       this.props.toasts.current?.addToast({ msg, type: "warning" })
     } finally {
       try {
@@ -318,7 +313,21 @@ export class BookmarkList extends React.Component<BookmarkListProps, BookmarkLis
     this.ref.current?.focus();
   }
 
-  move = async (node: BookmarkTreeNode): Promise<void> => {
+  move = () => {
+    const node = this.current()
+    if (node && !this.operationIsPending) {
+      this.operationIsPending = true
+      chrome.bookmarks.onMoved.removeListener(this.onMoved)
+      this.props.other.current?.moveHere(node)
+        .finally(() => this.getChildren())
+        .finally(() => {
+          chrome.bookmarks.onMoved.addListener(this.onMoved)
+          this.operationIsPending = false
+        })
+    }
+  }
+
+  moveHere = async (node: BookmarkTreeNode): Promise<void> => {
     for (const a of this.ancestors)
       if (a.id === node.id) {
         this.props.toasts.current?.addToast({
@@ -327,7 +336,9 @@ export class BookmarkList extends React.Component<BookmarkListProps, BookmarkLis
         return Promise.resolve()
       }
 
-    return chrome.bookmarks.move(node.id, { parentId: this.parentId(), index: this.index(node) })
+    return chrome.bookmarks.move(node.id, {
+      parentId: this.parentId(), index: this.index(node)
+    })
       .then(() => {
         const msg = "Moved " + node.title
         this.props.toasts.current?.addToast({ msg, type: "success" })
@@ -350,9 +361,14 @@ export class BookmarkList extends React.Component<BookmarkListProps, BookmarkLis
   index = (node: BookmarkTreeNode): number | undefined => {
     return config["Keep Sorted"].val
       ? this.getIndexSorted(node)
-      : this.state.index === -1
-        ? undefined
-        : this.state.index
+      : this.state.index
+  }
+
+  current = () => {
+    const state = this.state
+    return state.index === undefined || state.index >= state.nodes.length
+      ? undefined
+      : state.nodes[state.index]
   }
 
   render() {
@@ -365,7 +381,7 @@ export class BookmarkList extends React.Component<BookmarkListProps, BookmarkLis
         onClick={this.onClick(index)}
       />
     });
-    const node = this.state.nodes[this.state.index]
+    const node = this.current()
 
     return (
       <div className="vstack h-100 p-0 outline bookmarks" ref={this.ref}
