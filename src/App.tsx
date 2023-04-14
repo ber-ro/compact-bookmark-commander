@@ -59,7 +59,7 @@ class App extends React.Component<{}, AppState> {
         </Row>
         <Row className='help bg-light'>
           <div className='p-0 text-truncate'>
-            <Options />
+            <Options focus={this.focus} />
             <KeyboardHints />
           </div>
         </Row>
