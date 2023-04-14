@@ -1,15 +1,16 @@
 import React from 'react';
-import { Button, Modal, Form } from 'react-bootstrap';
+import { Button, Form, Modal } from 'react-bootstrap';
+import { Ancestors } from './Breadcrumbs';
 
 interface CreateFolderProps {
   index: (a: chrome.bookmarks.BookmarkTreeNode) => number | undefined,
-  parentId: () => string,
-  breadcrumbs: string,
+  parentId:  string,
+  ancestors: Ancestors,
   hide: () => void
 }
 
 export function CreateFolder(
-  { index, parentId, breadcrumbs, hide }: CreateFolderProps
+  { index, parentId, ancestors, hide }: CreateFolderProps
 ) {
   const [title, setTitle] = React.useState("")
   const titleRef = React.useRef<HTMLInputElement>(null)
@@ -17,7 +18,7 @@ export function CreateFolder(
   const createFolder = (event: React.FormEvent) => {
     event.preventDefault()
     chrome.bookmarks.create({
-      index: index({ title } as chrome.bookmarks.BookmarkTreeNode), parentId: parentId(), title
+      index: index({ title } as chrome.bookmarks.BookmarkTreeNode), parentId: parentId, title
     })
       .then(() => hide())
       .catch((e) => { console.log(e) })
@@ -32,7 +33,7 @@ export function CreateFolder(
           <Modal.Title>Create Folder</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <p className="lead">{breadcrumbs}</p>
+          <p className="lead">{ancestors.breadcrumbs()}</p>
           <Form tabIndex={0} onSubmit={createFolder} id="CreateFolder">
             <Form.Group>
               <Form.Control type="text"

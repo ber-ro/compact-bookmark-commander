@@ -1,16 +1,17 @@
 import React from 'react';
 import { Alert, Button, Form, Modal } from 'react-bootstrap';
+import { Ancestors } from './Breadcrumbs';
 
 interface EditProps {
   id: string,
   title: string,
   url: string | undefined,
-  breadcrumbs: string,
+  ancestors: Ancestors,
   hide: () => void
 }
 
 export function Edit(
-  { id, title, url, breadcrumbs, hide }: EditProps
+  { id, title, url, ancestors, hide }: EditProps
 ) {
   const [getTitle, setTitle] = React.useState(title)
   const [getUrl, setUrl] = React.useState(url)
@@ -43,7 +44,7 @@ export function Edit(
           <Modal.Title>Edit</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <p className="lead">{breadcrumbs}</p>
+          <p className="lead">{ancestors.breadcrumbs()}</p>
           <Form tabIndex={0} onSubmit={onSubmit} id="Edit-Title-URL">
             <Form.Group className="mb-3">
               <Form.Label>Title</Form.Label>
