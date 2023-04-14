@@ -36,7 +36,7 @@ function ToastsComponent(props: ToastsProps, ref: React.Ref<ToastRef>) {
 
   const CreateDetails = (obj: BookmarkTreeNode) => {
     return Object.fromEntries(Object.entries(obj).filter(
-      ([key]) => ['index', 'parentId', 'title', 'url'].indexOf(key) != -1
+      ([key]) => ['index', 'parentId', 'title', 'url'].indexOf(key) !== -1
     ))
   }
 
