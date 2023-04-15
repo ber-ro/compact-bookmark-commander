@@ -1,39 +1,35 @@
-import { BookmarkList } from './BookmarkList';
-import { Col, Container, Row } from 'react-bootstrap';
-import { CBCTooltip } from './Util';
-import { Options } from './Options';
-import { ToastRef, Toasts } from './Toasts';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
+import { Col, Container, Row } from 'react-bootstrap';
+import { BookmarkList } from './BookmarkList';
+import { Options } from './Options';
+import { ToastRef, Toasts } from './Toasts';
+import { CBCTooltip } from './Util';
 
 interface AppState {
   showUrls: boolean
 }
 
 class App extends React.Component<{}, AppState> {
-  pane: React.RefObject<BookmarkList>[] = Array.from([0, 1], () => React.createRef());
+  pane: React.RefObject<BookmarkList>[]
+    = Array.from([0, 1], () => React.createRef())
   toasts = React.createRef<ToastRef>()
   hasFocus = 0
-  constructor(props: {}) {
-    super(props);
-    this.state = { showUrls: true };
-  }
+  state = { showUrls: true };
 
   componentDidMount() {
     this.focus();
   }
 
   focus = (num?: number) => {
-    if (num)
+    if (num !== undefined)
       this.hasFocus = num
     this.pane[this.hasFocus].current?.focus();
   }
 
   onKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Tab") {
-      this.hasFocus =
-        this.pane[0].current?.ref.current === document.activeElement ? 1 : 0
-      this.focus()
+      this.focus(this.hasFocus ? 0 : 1)
     } else if (e.key === "F3") {
       this.setState({ showUrls: !this.state.showUrls })
     } else {
@@ -45,12 +41,13 @@ class App extends React.Component<{}, AppState> {
 
   render() {
     return (
-      <Container className="App" fluid onKeyDown={this.onKeyDown} tabIndex={0}>
+      <Container className="App" fluid onKeyDown={this.onKeyDown}>
         <Row className='panes'>
           {this.pane.map((ref, index) => (
-            <Col className='pane-container col-6' key={index}>
+            <Col className='pane-container col-6' key={index}
+              onClick={() => { this.focus(index) }}
+            >
               <BookmarkList
-                focus={() => { this.focus(index) }}
                 side={index.toString()}
                 showUrls={this.state.showUrls}
                 other={index === 0 ? this.pane[1] : this.pane[0]}
@@ -107,6 +104,3 @@ root.render(
     <App />
   </React.StrictMode>
 );
-
-export { App };
-export default App;

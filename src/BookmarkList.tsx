@@ -17,7 +17,6 @@ interface BookmarkListState {
 }
 
 interface BookmarkListProps {
-  focus: () => void
   other: RefObject<BookmarkList>
   showUrls: boolean
   side: string
@@ -131,13 +130,6 @@ export class BookmarkList extends React.Component<BookmarkListProps, BookmarkLis
     return new Promise((resolve) => {
       this.setState(state as BookmarkListState, () => resolve(state))
     })
-  }
-
-  onClick = (index: number): (() => void) => {
-    return () => {
-      this.props.focus()
-      this.setState({ index: index });
-    }
   }
 
   onKeyDown = (e: React.KeyboardEvent) => {
@@ -316,7 +308,7 @@ export class BookmarkList extends React.Component<BookmarkListProps, BookmarkLis
         key={node.id}
         containerRef={this.ref}
         showUrls={this.props.showUrls}
-        onClick={this.onClick(index)}
+        setItem={() => { this.setState({ index }) }}
       />
     });
     const node = this.current()

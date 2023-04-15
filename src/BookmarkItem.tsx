@@ -7,7 +7,7 @@ interface BookmarkProps {
   , isCurrent: boolean
   , containerRef: RefObject<HTMLElement>
   , showUrls: boolean
-  , onClick: () => void
+  , setItem: () => void
 }
 
 export class BookmarkItem extends React.PureComponent<BookmarkProps, {}>
@@ -41,10 +41,6 @@ export class BookmarkItem extends React.PureComponent<BookmarkProps, {}>
     this.scrollIntoView(prev)
   }
 
-  onClick = () => {
-    this.props.onClick()
-  }
-
   favicon = (): JSX.Element => {
     if (!this.props.node.url)
       return <></>
@@ -65,15 +61,11 @@ export class BookmarkItem extends React.PureComponent<BookmarkProps, {}>
     const node = this.props.node
     return node.url?.startsWith("http")
       ? (
-        <a href={node.url} onFocus={this.onFocus}>
+        <a href={node.url} >
           {this.favicon()} {node.title}
         </a>
       )
       : <>{node.title}</>
-  }
-
-  onFocus = () => {
-    this.props.containerRef.current?.focus()
   }
 
   render() {
@@ -88,7 +80,7 @@ export class BookmarkItem extends React.PureComponent<BookmarkProps, {}>
 
     return (
       <Card style={{}} bg={bg} text={text} className={classes.join(' ')}
-        ref={this.refCallback} onClick={this.onClick}>
+        ref={this.refCallback} onClick={() => { this.props.setItem() }}>
         <Card.Body className='p-0'>
           <Card.Title as='strong'
             className={this.props.node.url ? '' : 'bookmark-folder'}
