@@ -23,7 +23,9 @@ class App extends React.Component<{}, AppState> {
     this.focus();
   }
 
-  focus = () => {
+  focus = (num?: number) => {
+    if (num)
+      this.hasFocus = num
     this.pane[this.hasFocus].current?.focus();
   }
 
@@ -48,6 +50,7 @@ class App extends React.Component<{}, AppState> {
           {this.pane.map((ref, index) => (
             <Col className='pane-container col-6' key={index}>
               <BookmarkList
+                focus={() => { this.focus(index) }}
                 side={index.toString()}
                 showUrls={this.state.showUrls}
                 other={index === 0 ? this.pane[1] : this.pane[0]}

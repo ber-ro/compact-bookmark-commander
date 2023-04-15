@@ -17,10 +17,11 @@ interface BookmarkListState {
 }
 
 interface BookmarkListProps {
+  focus: () => void
+  other: RefObject<BookmarkList>
+  showUrls: boolean
   side: string
-  , other: RefObject<BookmarkList>
-  , toasts: RefObject<ToastRef>
-  , showUrls: boolean
+  toasts: RefObject<ToastRef>
 }
 
 function normalizeUrl(url: string) {
@@ -133,7 +134,10 @@ export class BookmarkList extends React.Component<BookmarkListProps, BookmarkLis
   }
 
   onClick = (index: number): (() => void) => {
-    return () => { this.setState({ index: index }); }
+    return () => {
+      this.props.focus()
+      this.setState({ index: index });
+    }
   }
 
   onKeyDown = (e: React.KeyboardEvent) => {
