@@ -59,13 +59,11 @@ export class BookmarkItem extends React.PureComponent<BookmarkProps, {}>
 
   link = (): JSX.Element => {
     const node = this.props.node
-    return node.url?.startsWith("http")
-      ? (
-        <a href={node.url} >
-          {this.favicon()} {node.title}
-        </a>
-      )
-      : <>{node.title}</>
+    return (
+      <a href={node.url} >
+        {this.favicon()} {node.title}
+      </a>
+    )
   }
 
   render() {
