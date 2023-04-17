@@ -8,8 +8,7 @@ interface CBCTooltipProps {
 export const CBCTooltip = ({ text, children }: CBCTooltipProps) => {
   return (
     <OverlayTrigger
-      key={text}
-      placement={'top'}
+      // placement={'top'}
       overlay={
         text
           ? <Tooltip className='position-fixed'>{text}</Tooltip>

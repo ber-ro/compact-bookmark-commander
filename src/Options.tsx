@@ -34,13 +34,13 @@ export function Option({ title, focus }: {
 
   return (
     <CBCTooltip text={config[title].text || title}>
-      <label key={title} className='me-2'>
+      <label key={title} className='me-2 bm-key-definition'>
         <input
-          type="checkbox"
+          type="checkbox" className='align-bottom'
           checked={get}
           onChange={handleChange}
         />
-        <span className='align-top'>{config[title].abbr}</span>
+        <span className='px-1'>{config[title].abbr}</span>
       </label>
     </CBCTooltip>
   )

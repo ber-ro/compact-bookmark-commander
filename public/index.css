@@ -69,7 +69,11 @@ div.pane-container {
   color: white;
 }
 
-.tooltip > .tooltip-inner {
+svg {
+  color: slategray;
+}
+
+.tooltip>.tooltip-inner {
   white-space: pre-line;
   text-align: left;
 }
