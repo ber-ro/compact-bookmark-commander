@@ -2,7 +2,7 @@ import { CBCTooltip } from './Util';
 import React from 'react';
 
 export const config = Object.fromEntries([
-  ["Sort By Title", "st"],
+  ["Sort By Title", "st", "Sort by Title instead of URL"],
   ["Keep Sorted", "ks", "Keep Sorted after Move/Create Folder"]
 ].map(([key, abbr, text]) => ([[key], { abbr, text, val: undefined }])))
 
