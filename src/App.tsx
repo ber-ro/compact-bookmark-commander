@@ -72,6 +72,7 @@ class App extends React.Component<{}, AppState> {
 
 const QuestionMark = () => {
   return (
+    // https://icons.getbootstrap.com/icons/question-circle-fill/
     <svg xmlns="http://www.w3.org/2000/svg"
       width="16" height="16" fill="currentColor"
       key={"1"}
@@ -87,7 +88,7 @@ const QuestionMark = () => {
 
 const Help = () => {
   return (
-    <CBCTooltip text="Mainly keyboard usage. The only mouse operations are checkboxes, selecting an item and hyperlinks. Hover over checkboxes/keyboard hints containing '...' for additional info.">
+    <CBCTooltip text="Mainly keyboard usage. The only mouse interactions are checkboxes, selecting an item and hyperlinks. Hover over checkboxes/keyboard hints containing '...' for additional info.">
       {QuestionMark()}
     </CBCTooltip>
   )
