@@ -31,7 +31,6 @@ function ToastsComponent(props: ToastsProps, ref: React.Ref<ToastRef>) {
 
   const removeToast = (id: number | undefined) => {
     setMessages((messages) => messages.filter((e) => e.id !== id));
-    props.focus()
   }
 
   const CreateDetails = (obj: BookmarkTreeNode) => {
@@ -63,6 +62,7 @@ function ToastsComponent(props: ToastsProps, ref: React.Ref<ToastRef>) {
       }
     }
     removeToast(msg.id)
+    props.focus()
   }
 
   const UndoButton = (msg: Msg) => {
@@ -88,10 +88,15 @@ function ToastsComponent(props: ToastsProps, ref: React.Ref<ToastRef>) {
             <div className='flex-grow-1'>{msg.msg}</div>
             {UndoButton(msg)}
             <button type="button"
-              className={"btn-closeme-2 btn-close flex-grow-0 flex-shrink-0"
-                + (msg.type === "success" ? " btn-close-white" : "")}
-              data-bs-dismiss="toast"
-              onClick={() => removeToast(msg.id)} aria-label="Close" />
+              className={
+                "btn-closeme-2 btn-close flex-grow-0 flex-shrink-0"
+                + (msg.type === "success" ? " btn-close-white" : "")
+              }
+              data-bs-dismiss="toast" aria-label="Close"
+              onClick={() => {
+                removeToast(msg.id)
+                props.focus()
+              }} />
           </Toast.Body>
         </Toast>
       ))}

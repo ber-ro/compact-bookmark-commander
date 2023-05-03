@@ -44,9 +44,7 @@ class App extends React.Component<{}, AppState> {
       <Container className="App" fluid onKeyDown={this.onKeyDown}>
         <Row className='panes'>
           {this.pane.map((ref, index) => (
-            <Col className='pane-container col-6' key={index}
-              onClick={() => { this.focus(index) }}
-            >
+            <Col className='pane-container col-6' key={index}>
               <BookmarkList
                 side={index.toString()}
                 showUrls={this.state.showUrls}

@@ -4,21 +4,22 @@ import { Ancestors } from './Breadcrumbs';
 
 interface CreateFolderProps {
   index: (a: chrome.bookmarks.BookmarkTreeNode) => number | undefined,
-  parentId:  string,
+  parentId: string,
   ancestors: Ancestors,
   hide: () => void
 }
 
-export function CreateFolder(
-  { index, parentId, ancestors, hide }: CreateFolderProps
+export const CreateFolder = React.forwardRef(function CreateFolder(
+  { index, parentId, ancestors, hide }: CreateFolderProps,
+  ref: React.Ref<HTMLInputElement>
 ) {
   const [title, setTitle] = React.useState("")
-  const titleRef = React.useRef<HTMLInputElement>(null)
 
   const createFolder = (event: React.FormEvent) => {
     event.preventDefault()
     chrome.bookmarks.create({
-      index: index({ title } as chrome.bookmarks.BookmarkTreeNode), parentId: parentId, title
+      index: index({ title } as chrome.bookmarks.BookmarkTreeNode)
+      , parentId: parentId, title
     })
       .then(() => hide())
       .catch((e) => { console.log(e) })
@@ -27,8 +28,7 @@ export function CreateFolder(
   return (
     <>
       <Modal show={true} keyboard={true} onHide={() => hide()}
-        dialogClassName="w-100 mw-100"
-        onEntered={() => titleRef?.current?.focus()}>
+        dialogClassName="w-100 mw-100">
         <Modal.Header>
           <Modal.Title>Create Folder</Modal.Title>
         </Modal.Header>
@@ -37,7 +37,7 @@ export function CreateFolder(
           <Form tabIndex={0} onSubmit={createFolder} id="CreateFolder">
             <Form.Group>
               <Form.Control type="text"
-                ref={titleRef}
+                autoFocus ref={ref}
                 value={title} onChange={(e) => { setTitle(e.target.value) }} />
             </Form.Group>
           </Form>
@@ -51,4 +51,4 @@ export function CreateFolder(
       </Modal>
     </>
   );
-}
+})

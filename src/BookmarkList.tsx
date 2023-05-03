@@ -51,8 +51,10 @@ const compareTitle = (a: BookmarkTreeNode, b: BookmarkTreeNode) => {
 
 export class BookmarkList extends React.Component<BookmarkListProps, BookmarkListState>
 {
-  ref: React.RefObject<HTMLDivElement> = React.createRef();
-  scrollRef: React.RefObject<HTMLDivElement> = React.createRef();
+  ref = React.createRef<HTMLDivElement>()
+  refCreateFolder = React.createRef<HTMLInputElement>()
+  refEdit = React.createRef<HTMLInputElement>()
+  scrollRef = React.createRef<HTMLDivElement>()
   operationIsPending = false
   id = "0"
 
@@ -243,7 +245,12 @@ export class BookmarkList extends React.Component<BookmarkListProps, BookmarkLis
   }
 
   focus(): void {
-    this.ref.current?.focus();
+    if (this.state.showCreateFolder)
+      this.refCreateFolder.current?.focus()
+    else if (this.state.showEdit)
+      this.refEdit.current?.focus()
+    else
+      this.ref.current?.focus();
   }
 
   move = () => {
@@ -325,6 +332,7 @@ export class BookmarkList extends React.Component<BookmarkListProps, BookmarkLis
             index={this.index}
             parentId={this.id}
             ancestors={this.state.ancestors}
+            ref={this.refCreateFolder}
             hide={() => { this.setState({ showCreateFolder: false }) }} />
         )}
         {this.state.showEdit && node && (
@@ -333,6 +341,7 @@ export class BookmarkList extends React.Component<BookmarkListProps, BookmarkLis
             title={node.title}
             url={node.url}
             ancestors={this.state.ancestors}
+            ref={this.refEdit}
             hide={() => { this.setState({ showEdit: false }) }} />
         )}
       </div>

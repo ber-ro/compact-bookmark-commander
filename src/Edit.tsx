@@ -10,13 +10,24 @@ interface EditProps {
   hide: () => void
 }
 
-export function Edit(
+export const Edit = React.forwardRef(function Edit(
   { id, title, url, ancestors, hide }: EditProps
+  , ref
 ) {
   const [getTitle, setTitle] = React.useState(title)
   const [getUrl, setUrl] = React.useState(url)
   const [message, setMessage] = React.useState("")
-  const titleRef = React.useRef<HTMLInputElement>(null)
+  const focused = React.useRef<HTMLInputElement | null>(null)
+
+  React.useImperativeHandle(ref, () => { return { focus } }, [])
+
+  const setFocus = (e: React.FocusEvent<HTMLInputElement>) => {
+    focused.current = e.currentTarget as HTMLInputElement
+  }
+
+  const focus = () => {
+    focused.current?.focus()
+  }
 
   const onKeyDown = (e: React.KeyboardEvent) => {
     e.stopPropagation()
@@ -38,7 +49,7 @@ export function Edit(
 
   return (
     <>
-      <Modal show={true} onEntered={() => titleRef?.current?.focus()}
+      <Modal show={true}
         onKeyDown={onKeyDown} dialogClassName="w-100 mw-100" >
         <Modal.Header>
           <Modal.Title>Edit</Modal.Title>
@@ -48,14 +59,18 @@ export function Edit(
           <Form tabIndex={0} onSubmit={onSubmit} id="Edit-Title-URL">
             <Form.Group className="mb-3">
               <Form.Label>Title</Form.Label>
-              <Form.Control type="text" ref={titleRef}
-                value={getTitle} onChange={(e) => setTitle(e.target.value)} />
+              <Form.Control type="text" autoFocus
+                value={getTitle}
+                onFocus={setFocus}
+                onChange={(e) => setTitle(e.target.value)} />
             </Form.Group>
             {getUrl && (
               <Form.Group>
                 <Form.Label>URL</Form.Label>
                 <Form.Control type="text" as="textarea" rows={8}
-                  value={getUrl} onChange={(e) => setUrl(e.target.value)} />
+                  value={getUrl}
+                  onFocus={setFocus}
+                  onChange={(e) => setUrl(e.target.value)} />
               </Form.Group>
             )}
             {message && <Alert variant='danger'>{message}</Alert>}
@@ -70,4 +85,4 @@ export function Edit(
       </Modal>
     </>
   );
-}
+})

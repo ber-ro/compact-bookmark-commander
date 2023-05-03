@@ -1,5 +1,3 @@
-"use strict";
-
 import cpy from 'cpy';
 import process from 'process';
 
