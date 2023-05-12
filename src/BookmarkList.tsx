@@ -57,6 +57,7 @@ export class BookmarkList extends React.Component<BookmarkListProps, BookmarkLis
   scrollRef = React.createRef<HTMLDivElement>()
   operationIsPending = false
   id = "0"
+  dirty: boolean | undefined;
 
   constructor(props: BookmarkListProps) {
     super(props)
@@ -76,6 +77,8 @@ export class BookmarkList extends React.Component<BookmarkListProps, BookmarkLis
     chrome.bookmarks.onRemoved.addListener(this.onRemoved)
     const key = this.props.side;
     this.goto((await chrome.storage.local.get(key))[key] ?? "0")
+    window.addEventListener("pagehide", this.save)
+
   }
 
   componentWillUnmount() {
@@ -83,6 +86,13 @@ export class BookmarkList extends React.Component<BookmarkListProps, BookmarkLis
     chrome.bookmarks.onCreated.removeListener(this.onCreated)
     chrome.bookmarks.onMoved.removeListener(this.onMoved)
     chrome.bookmarks.onRemoved.removeListener(this.onRemoved)
+    window.removeEventListener("pagehide", this.save)
+  }
+
+  save = () => {
+    if (this.dirty)
+      chrome.storage.local.set({ [this.props.side]: this.id })
+        .then(() => { this.dirty = false })
   }
 
   onChanged = (id: string) => {
@@ -121,7 +131,7 @@ export class BookmarkList extends React.Component<BookmarkListProps, BookmarkLis
   ): Promise<Partial<BookmarkListState>> => {
     if (id) {
       this.id = id
-      chrome.storage.local.set({ [this.props.side]: id })
+      this.dirty = this.dirty !== undefined // do not set dirty in initialization
     }
     state.nodes = await chrome.bookmarks.getChildren(this.id)
     if (state.id) {
