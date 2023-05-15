@@ -5,6 +5,7 @@ import { CreateFolder } from './CreateFolder';
 import { Edit } from './Edit';
 import { config } from './Options';
 import { ToastRef } from './Toasts';
+import * as Util from './Util';
 
 type BookmarkTreeNode = chrome.bookmarks.BookmarkTreeNode;
 
@@ -78,7 +79,6 @@ export class BookmarkList extends React.Component<BookmarkListProps, BookmarkLis
     const key = this.props.side;
     this.goto((await chrome.storage.local.get(key))[key] ?? "0")
     window.addEventListener("pagehide", this.save)
-
   }
 
   componentWillUnmount() {
@@ -95,34 +95,37 @@ export class BookmarkList extends React.Component<BookmarkListProps, BookmarkLis
         .then(() => { this.dirty = false })
   }
 
-  onChanged = (id: string) => {
-    if (this.state.nodes.find((el) => el.id === id))
-      this.getChildren({ id })
+  onChanged = (id: string, ci: chrome.bookmarks.BookmarkChangeInfo) => {
+    const nodes = Util.mutateChangedNodes(id, ci, this.state.nodes)
+    if (nodes)
+      this.setState({ nodes })
+    const ancestors = Util.mutateChangedNodes(id, ci, this.state.ancestors.ancestors)
+    if (ancestors)
+      this.setState({ ancestors: new Ancestors(ancestors) })
   }
 
   onCreated = (id: string, bookmark: BookmarkTreeNode) => {
     if (bookmark.parentId === this.id)
-      this.getChildren({ id })
+      this.getChildren()
   }
 
-  onMoved = (id: string, moveInfo: chrome.bookmarks.BookmarkMoveInfo) => {
-    this.state.ancestors.refresh(id).then(() => {
-      const parent = this.id
-      if (parent === moveInfo.parentId)
-        this.getChildren({ id }).then(() => {
-          if (!config["Keep Sorted"].val)
-            this.prevNextItem(+1)
-        })
-      else if (id || parent === moveInfo.oldParentId)
-        this.getChildren()
-    })
+  onMoved = (id: string, mi: chrome.bookmarks.BookmarkMoveInfo) => {
+    if (this.id === mi.parentId)
+      this.getChildren().then(() => {
+        if (mi.index === this.state.index && !config["Keep Sorted"].val)
+          this.prevNextItem(+1)
+      })
+    else if (this.id === mi.oldParentId)
+      this.getChildren()
+    else
+      this.state.ancestors.refresh(id)
   }
 
   onRemoved = (id: string, removeInfo: chrome.bookmarks.BookmarkRemoveInfo) => {
-    this.state.ancestors.refresh(id).then((val) => {
-      if (val || this.id === removeInfo.parentId)
-        this.getChildren()
-    })
+    if (this.id === removeInfo.parentId)
+      this.getChildren()
+    else
+      this.state.ancestors.refresh(id)
   }
 
   getChildren = async (
@@ -263,6 +266,11 @@ export class BookmarkList extends React.Component<BookmarkListProps, BookmarkLis
       this.ref.current?.focus();
   }
 
+  onBlur = (e: React.FocusEvent<HTMLDivElement>) => {
+    if (!e.relatedTarget?.classList.contains("bookmarks"))
+      setTimeout(() => { this.focus() })
+  }
+
   move = () => {
     const node = this.current()
     if (node && !this.operationIsPending) {
@@ -332,7 +340,7 @@ export class BookmarkList extends React.Component<BookmarkListProps, BookmarkLis
 
     return (
       <div className="vstack h-100 p-0 outline bookmarks" ref={this.ref}
-        tabIndex={0} onKeyDown={this.onKeyDown}>
+        tabIndex={0} onKeyDown={this.onKeyDown} onBlur={this.onBlur}>
         <Breadcrumbs ancestors={this.state.ancestors} />
         <div className="p-0 overflow-auto" ref={this.scrollRef}>
           <div className="mb-0 p-0 pane"> {listItems} </div>

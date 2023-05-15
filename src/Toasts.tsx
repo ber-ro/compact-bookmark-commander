@@ -13,12 +13,8 @@ export interface ToastRef {
   addToast: (msg: Msg) => void
 }
 
-interface ToastsProps {
-  focus: () => void
-}
-
 export const Toasts = React.forwardRef(ToastsComponent)
-function ToastsComponent(props: ToastsProps, ref: React.Ref<ToastRef>) {
+function ToastsComponent(_props: any, ref: React.Ref<ToastRef>) {
   const [messages, setMessages] = React.useState<Msg[]>([]);
   const id = React.useRef<number>();
 
@@ -62,7 +58,6 @@ function ToastsComponent(props: ToastsProps, ref: React.Ref<ToastRef>) {
       }
     }
     removeToast(msg.id)
-    props.focus()
   }
 
   const UndoButton = (msg: Msg) => {
@@ -95,7 +90,6 @@ function ToastsComponent(props: ToastsProps, ref: React.Ref<ToastRef>) {
               data-bs-dismiss="toast" aria-label="Close"
               onClick={() => {
                 removeToast(msg.id)
-                props.focus()
               }} />
           </Toast.Body>
         </Toast>

@@ -6,9 +6,8 @@ export const config = Object.fromEntries([
   ["Keep Sorted", "ks", "Keep Sorted after Move/Create Folder"]
 ].map(([key, abbr, text]) => ([[key], { abbr, text, val: undefined }])))
 
-export function Option({ title, focus }: {
+export function Option({ title }: {
   title: string
-  focus: () => void
 }) {
   const [get, set] = React.useState(false)
   const initialized = React.useRef<boolean>()
@@ -29,7 +28,6 @@ export function Option({ title, focus }: {
     const val = !get
     setAll(val)
     chrome.storage.local.set({ [title]: val })
-    focus()
   }
 
   return (
@@ -46,13 +44,11 @@ export function Option({ title, focus }: {
   )
 }
 
-export function Options(
-  { focus }: { focus: () => void }
-) {
+export function Options() {
   return (
     <>
       {Object.keys(config).map((key) => (
-        <Option key={key} focus={focus} title={key} />
+        <Option key={key} title={key} />
       ))}
     </>
   );

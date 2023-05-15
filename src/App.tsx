@@ -60,11 +60,11 @@ class App extends React.Component<{}, AppState> {
         <Row className='help bg-light'>
           <div className='p-0 text-truncate help-bar'>
             <Help />
-            <Options focus={this.focus} />
+            <Options />
             <KeyboardHints />
           </div>
         </Row>
-        <Toasts ref={this.toasts} focus={this.focus} />
+        <Toasts ref={this.toasts} />
       </Container>
     );
   }

@@ -19,3 +19,19 @@ export const CBCTooltip = ({ text, children }: CBCTooltipProps) => {
     </OverlayTrigger>
   )
 }
+
+export const mutateChangedNodes = (
+  id: string,
+  ci: chrome.bookmarks.BookmarkChangeInfo,
+  array: chrome.bookmarks.BookmarkTreeNode[]
+) => {
+  let nodes = array
+  for (let i = 0; i < nodes.length; i++) {
+    if (nodes[i].id === id) {
+      nodes = [...nodes]
+      nodes[i].title = ci.title
+      nodes[i].url = ci.url
+      return nodes
+    }
+  }
+}
