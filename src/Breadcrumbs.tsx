@@ -59,10 +59,8 @@ export class Ancestors {
   }
 
   gotoParent = () => {
-    if (this.ancestors.length === 1)
-      return undefined
-
-    this.ancestors = this.ancestors.slice(0, -1)
-    return this.ancestors.at(-1)!.id
+    return this.ancestors.length === 1
+      ? undefined
+      : this.ancestors.slice(0, -1)
   }
 }

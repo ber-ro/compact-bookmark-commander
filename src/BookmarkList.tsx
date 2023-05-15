@@ -201,10 +201,16 @@ export class BookmarkList extends React.Component<BookmarkListProps, BookmarkLis
     this.setState({ index: idx })
   }
 
-  goto(id: string) {
-    this.state.ancestors.refresh(undefined, id).then((id) => {
-      this.getChildren({ index: 0 }, id)
-    })
+  goto(node: BookmarkTreeNode | string) {
+    if (typeof node === "string")
+      this.state.ancestors.refresh(undefined, node).then((id) => {
+        this.getChildren({ index: 0 }, id)
+      })
+    else {
+      const ancestors = new Ancestors([...this.state.ancestors.ancestors, node])
+      this.setState({ ancestors })
+      this.getChildren({ index: 0 }, node.id)
+    }
   }
 
   open(node: BookmarkTreeNode | undefined) {
@@ -215,14 +221,16 @@ export class BookmarkList extends React.Component<BookmarkListProps, BookmarkLis
       if (node.url.startsWith("http"))
         window.open(node.url)
     } else {
-      this.goto(node.id)
+      this.goto(node)
     }
   }
 
   gotoParent() {
-    const id = this.state.ancestors.gotoParent()
-    if (id)
-      this.getChildren({ id: this.id }, id)
+    const ancestors = this.state.ancestors.gotoParent()
+    if (ancestors) {
+      this.setState({ ancestors: new Ancestors(ancestors) })
+      this.getChildren({ id: this.id }, ancestors.at(-1)?.id)
+    }
   }
 
   async delete(recurse: boolean) {
