@@ -1,4 +1,5 @@
 import React from 'react'
+import { BookmarkList } from './BookmarkList'
 
 export const Breadcrumbs = ({ ancestors }: { ancestors: Ancestors }) => {
   return (
@@ -46,11 +47,13 @@ export class Ancestors {
     }
   }
 
-  refresh = async (modifiedId?: string, id?: string) => {
+  refresh = async (stateContainer: BookmarkList, modifiedId?: string, id?: string) => {
     if (modifiedId && !this.ancestors.find((el) => el.id === modifiedId))
       return
 
-    return new Ancestors(await this.getAncestors(id || await this.findExistingId()))
+    const ancestors = await this.getAncestors(id || await this.findExistingId())
+    stateContainer.setState({ ancestors: new Ancestors(ancestors) })
+    return ancestors
   }
 
   breadcrumbs = () => {

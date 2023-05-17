@@ -118,20 +118,14 @@ export class BookmarkList extends React.Component<BookmarkListProps, BookmarkLis
     else if (this.id === mi.oldParentId)
       this.getChildren()
     else
-      this.state.ancestors.refresh(id).then((ancestors) => {
-        if (ancestors)
-          this.setState({ ancestors })
-      })
+      this.state.ancestors.refresh(this, id)
   }
 
   onRemoved = (id: string, removeInfo: chrome.bookmarks.BookmarkRemoveInfo) => {
     if (this.id === removeInfo.parentId)
       this.getChildren()
     else
-      this.state.ancestors.refresh(id).then((ancestors) => {
-        if (ancestors)
-          this.setState({ ancestors })
-      })
+      this.state.ancestors.refresh(this, id)
   }
 
   getChildren = async (
@@ -209,10 +203,8 @@ export class BookmarkList extends React.Component<BookmarkListProps, BookmarkLis
 
   goto(node: BookmarkTreeNode | string) {
     if (typeof node === "string") {
-      this.state.ancestors.refresh(undefined, node).then((ancestors) => {
-        if (ancestors)
-          this.setState({ ancestors })
-        this.getChildren({ index: 0 }, ancestors!.ancestors.at(-1)?.id)
+      this.state.ancestors.refresh(this, undefined, node).then((ancestors) => {
+        this.getChildren({ index: 0 }, ancestors!.at(-1)?.id)
       })
     } else {
       const ancestors = new Ancestors([...this.state.ancestors.ancestors, node])
