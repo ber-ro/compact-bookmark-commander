@@ -119,7 +119,8 @@ export class BookmarkList extends React.Component<BookmarkListProps, BookmarkLis
       this.getChildren()
     else
       this.state.ancestors.refresh(id).then((ancestors) => {
-        this.setState({ ancestors: new Ancestors(ancestors) })
+        if (ancestors)
+          this.setState({ ancestors })
       })
   }
 
@@ -128,7 +129,8 @@ export class BookmarkList extends React.Component<BookmarkListProps, BookmarkLis
       this.getChildren()
     else
       this.state.ancestors.refresh(id).then((ancestors) => {
-        this.setState({ ancestors: new Ancestors(ancestors) })
+        if (ancestors)
+          this.setState({ ancestors })
       })
   }
 
@@ -206,14 +208,13 @@ export class BookmarkList extends React.Component<BookmarkListProps, BookmarkLis
   }
 
   goto(node: BookmarkTreeNode | string) {
-    if (typeof node === "string")
+    if (typeof node === "string") {
       this.state.ancestors.refresh(undefined, node).then((ancestors) => {
-        this.getChildren({
-          index: 0,
-          ancestors: new Ancestors(ancestors)
-        }, ancestors?.at(-1)?.id)
+        if (ancestors)
+          this.setState({ ancestors })
+        this.getChildren({ index: 0 }, ancestors!.ancestors.at(-1)?.id)
       })
-    else {
+    } else {
       const ancestors = new Ancestors([...this.state.ancestors.ancestors, node])
       this.setState({ ancestors })
       this.getChildren({ index: 0 }, node.id)
