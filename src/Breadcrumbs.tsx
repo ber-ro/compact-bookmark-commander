@@ -50,8 +50,7 @@ export class Ancestors {
     if (modifiedId && !this.ancestors.find((el) => el.id === modifiedId))
       return
 
-    this.ancestors = await this.getAncestors(id || await this.findExistingId())
-    return this.ancestors.at(-1)!.id
+    return await this.getAncestors(id || await this.findExistingId())
   }
 
   breadcrumbs = () => {
