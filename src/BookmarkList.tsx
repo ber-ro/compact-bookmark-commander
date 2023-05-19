@@ -65,7 +65,7 @@ export class BookmarkList extends React.Component<BookmarkListProps, BookmarkLis
     this.state = {
       nodes: []
       , ancestors: new Ancestors()
-      , index: 0
+      , index: undefined
       , showCreateFolder: false
       , showEdit: false
     }
@@ -136,12 +136,17 @@ export class BookmarkList extends React.Component<BookmarkListProps, BookmarkLis
       this.id = id
       this.dirty = this.dirty !== undefined // do not set dirty in initialization
     }
+
     state.nodes = await chrome.bookmarks.getChildren(this.id)
+
+    if (!state.id && this.state.index !== undefined && this.state.nodes.length)
+      state.id = this.state.nodes[this.state.index].id
     if (state.id) {
       const index = state.nodes?.findIndex((n) => n.id === state.id)
       if (index !== -1)
         state.index = index
     }
+
     return new Promise((resolve) => {
       this.setState(state as BookmarkListState, () => resolve(state))
     })
