@@ -60,9 +60,9 @@ export class BookmarkItem extends React.PureComponent<BookmarkProps, {}>
   link = (): JSX.Element => {
     const node = this.props.node
     return (
-      <a href={node.url} >
-        {this.favicon()} {node.title}
-      </a>
+      node.url?.startsWith("javascript") // avoid console warning
+        ? <>{node.title}</>
+        : <a href={node.url}>{this.favicon()} {node.title}</a>
     )
   }
 
