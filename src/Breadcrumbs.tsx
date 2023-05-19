@@ -52,6 +52,7 @@ export class Ancestors {
       return
 
     const ancestors = await this.getAncestors(id || await this.findExistingId())
+    stateContainer.id = ancestors.at(-1)!.id
     stateContainer.setState({ ancestors: new Ancestors(ancestors) })
     return ancestors
   }
