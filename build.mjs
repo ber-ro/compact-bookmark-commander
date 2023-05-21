@@ -18,7 +18,7 @@ let paths = [
   },
   {
     "from": [
-      "public/index.*"
+      "public/*"
     ],
     "to": "app"
   },

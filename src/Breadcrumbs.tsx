@@ -1,5 +1,5 @@
 import React from 'react'
-import { BookmarkList } from './BookmarkList'
+import { BookmarkList } from './BookmarkList.js'
 
 export const Breadcrumbs = ({ ancestors }: { ancestors: Ancestors }) => {
   return (

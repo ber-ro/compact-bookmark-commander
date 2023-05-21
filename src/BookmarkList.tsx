@@ -1,11 +1,11 @@
-import React, { RefObject } from 'react';
-import { BookmarkItem } from './BookmarkItem';
-import { Ancestors, Breadcrumbs } from './Breadcrumbs';
-import { CreateFolder } from './CreateFolder';
-import { Edit } from './Edit';
-import { config } from './Options';
-import { ToastRef } from './Toasts';
-import * as Util from './Util';
+import React, { RefObject } from 'react'
+import { BookmarkItem } from './BookmarkItem.js'
+import { Ancestors, Breadcrumbs } from './Breadcrumbs.js'
+import { CreateFolder } from './CreateFolder.js'
+import { Edit } from './Edit.js'
+import { config } from './Options.js'
+import { ToastRef } from './Toasts.js'
+import * as Util from './Util.js'
 
 type BookmarkRemoveInfo = chrome.bookmarks.BookmarkRemoveInfo;
 type BookmarkTreeNode = chrome.bookmarks.BookmarkTreeNode;
