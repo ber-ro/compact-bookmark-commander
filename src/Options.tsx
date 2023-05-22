@@ -35,6 +35,7 @@ export function Option({ title }: {
       <label key={title} className='me-2 bm-key-definition'>
         <input
           type="checkbox" className='align-bottom'
+          name={title}
           checked={get}
           onChange={handleChange}
         />
