@@ -1,4 +1,4 @@
-import React from 'react';
+import React from 'react'
 import { ToastContainer, Toast, Button } from 'react-bootstrap'
 type BookmarkTreeNode = chrome.bookmarks.BookmarkTreeNode
 
@@ -15,10 +15,10 @@ export interface ToastRef {
 
 export const Toasts = React.forwardRef(ToastsComponent)
 function ToastsComponent(_props: any, ref: React.Ref<ToastRef>) {
-  const [messages, setMessages] = React.useState<Msg[]>([]);
-  const id = React.useRef<number>();
+  const [messages, setMessages] = React.useState<Msg[]>([])
+  const id = React.useRef<number>()
 
-  React.useImperativeHandle(ref, () => ({ addToast }));
+  React.useImperativeHandle(ref, () => ({ addToast }))
 
   const addToast = (msg: Msg) => {
     msg.id = id.current = (id.current ?? 0) + 1
@@ -26,7 +26,7 @@ function ToastsComponent(_props: any, ref: React.Ref<ToastRef>) {
   }
 
   const removeToast = (id: number | undefined) => {
-    setMessages((messages) => messages.filter((e) => e.id !== id));
+    setMessages((messages) => messages.filter((e) => e.id !== id))
   }
 
   const CreateDetails = (obj: BookmarkTreeNode) => {
@@ -63,11 +63,26 @@ function ToastsComponent(_props: any, ref: React.Ref<ToastRef>) {
   const UndoButton = (msg: Msg) => {
     if (msg.undoInfo)
       return (
-        <Button size="sm" className='flex-grow-0 flex-shrink-0 mx-1' onClick={() => undo(msg)}>
+        <Button size="sm" className='flex-grow-0 flex-shrink-0 mx-1'
+          onClick={() => undo(msg)}
+        >
           Undo
         </Button>
       )
     return <></>
+  }
+
+  const CloseButton = (msg: Msg) => {
+    return (
+      <button type="button"
+        className={
+          "btn-closeme-2 btn-close flex-grow-0 flex-shrink-0"
+          + (msg.type === "success" ? " btn-close-white" : "")
+        }
+        data-bs-dismiss="toast" aria-label="Close"
+        onClick={() => { removeToast(msg.id) }}
+      />
+    )
   }
 
   return (
@@ -82,15 +97,7 @@ function ToastsComponent(_props: any, ref: React.Ref<ToastRef>) {
           <Toast.Body className='d-flex align-items-center p-1'>
             <div className='flex-grow-1'>{msg.msg}</div>
             {UndoButton(msg)}
-            <button type="button"
-              className={
-                "btn-closeme-2 btn-close flex-grow-0 flex-shrink-0"
-                + (msg.type === "success" ? " btn-close-white" : "")
-              }
-              data-bs-dismiss="toast" aria-label="Close"
-              onClick={() => {
-                removeToast(msg.id)
-              }} />
+            {CloseButton(msg)}
           </Toast.Body>
         </Toast>
       ))}
