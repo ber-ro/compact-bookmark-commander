@@ -39,6 +39,8 @@
   "license": "MIT",
   "devDependencies": {
     "eslint-config-react-app": "^7.0.1",
-    "eslint-plugin-react-hooks": "^4.6.0"
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "systemjs": "^6.14.1",
+    "systemjs-babel": "^0.3.2"
   }
 }

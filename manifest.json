@@ -8,17 +8,18 @@
     "storage"
   ],
   "background": {
-    "service_worker": "background.js"
+    "service_worker": "chrome/background.js"
   },
   "action": {},
   "icons": {
-    "128": "icon128.png"
+    "128": "chrome/icon128.png"
   },
   "externally_connectable": {
     "ids": []
   },
   "content_security_policy": {
-    "default-src": "self",
+    // "script-src": "self 'unsafe-eval'",
+    // "extension_pages": "script-src 'self' 'unsafe-eval'",
     "frame-ancestors": "none"
   }
 }
