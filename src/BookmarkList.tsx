@@ -1,14 +1,14 @@
-import React, { RefObject } from 'react';
-import { BookmarkItem } from './BookmarkItem';
-import { Ancestors, Breadcrumbs } from './Breadcrumbs';
-import { CreateFolder } from './CreateFolder';
-import { Edit } from './Edit';
-import { config } from './Options';
-import { ToastRef } from './Toasts';
-import * as Util from './Util';
+import React, { RefObject } from 'react'
+import { BookmarkItem } from './BookmarkItem.js'
+import { Ancestors, Breadcrumbs } from './Breadcrumbs.js'
+import { CreateFolder } from './CreateFolder.js'
+import { Edit } from './Edit.js'
+import { config } from './Options.js'
+import { ToastRef } from './Toasts.js'
+import * as Util from './Util.js'
 
-type BookmarkRemoveInfo = chrome.bookmarks.BookmarkRemoveInfo;
-type BookmarkTreeNode = chrome.bookmarks.BookmarkTreeNode;
+type BookmarkRemoveInfo = chrome.bookmarks.BookmarkRemoveInfo
+type BookmarkTreeNode = chrome.bookmarks.BookmarkTreeNode
 
 interface BookmarkListState {
   nodes: BookmarkTreeNode[]
@@ -59,7 +59,7 @@ export class BookmarkList extends React.Component<BookmarkListProps, BookmarkLis
   scrollRef = React.createRef<HTMLDivElement>()
   operationIsPending = false
   id = "0"
-  dirty: boolean | undefined;
+  dirty: boolean | undefined
 
   constructor(props: BookmarkListProps) {
     super(props)
@@ -77,7 +77,7 @@ export class BookmarkList extends React.Component<BookmarkListProps, BookmarkLis
     chrome.bookmarks.onCreated.addListener(this.onCreated)
     chrome.bookmarks.onMoved.addListener(this.onMoved)
     chrome.bookmarks.onRemoved.addListener(this.onRemoved)
-    const key = this.props.side;
+    const key = this.props.side
     this.goto((await chrome.storage.local.get(key))[key] ?? "0")
     window.addEventListener("pagehide", this.save)
   }
@@ -158,9 +158,9 @@ export class BookmarkList extends React.Component<BookmarkListProps, BookmarkLis
 
   onKeyDown = (e: React.KeyboardEvent) => {
     if (this.state.showCreateFolder || this.state.showEdit)
-      return;
+      return
 
-    // console.log(e.key);
+    // console.log(e.key)
     if (e.key === "ArrowDown") {
       this.prevNextItem(+1)
     } else if (e.key === "ArrowUp") {
@@ -280,7 +280,7 @@ export class BookmarkList extends React.Component<BookmarkListProps, BookmarkLis
     else if (this.state.showEdit)
       this.refEdit.current?.focus()
     else
-      this.ref.current?.focus();
+      this.ref.current?.focus()
   }
 
   onBlur = (e: React.FocusEvent<HTMLDivElement>) => {
@@ -352,7 +352,7 @@ export class BookmarkList extends React.Component<BookmarkListProps, BookmarkLis
         showUrls={this.props.showUrls}
         setItem={() => { this.setState({ index }) }}
       />
-    });
+    })
     const node = this.current()
 
     return (
@@ -380,8 +380,8 @@ export class BookmarkList extends React.Component<BookmarkListProps, BookmarkLis
             hide={() => { this.setState({ showEdit: false }) }} />
         )}
       </div>
-    );
+    )
   }
 }
 
-export default BookmarkList;
+export default BookmarkList

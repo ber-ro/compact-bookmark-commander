@@ -1,10 +1,10 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import { Col, Container, Row } from 'react-bootstrap';
-import { BookmarkList } from './BookmarkList';
-import { Options } from './Options';
-import { ToastRef, Toasts } from './Toasts';
-import { CBCTooltip } from './Util';
+import React from 'react'
+import ReactDOM from 'react-dom/client'
+import { Col, Container, Row } from 'react-bootstrap'
+import { BookmarkList } from './BookmarkList.js'
+import { Options } from './Options.js'
+import { ToastRef, Toasts } from './Toasts.js'
+import { CBCTooltip } from './Util.js'
 
 interface AppState {
   showUrls: boolean
@@ -15,16 +15,16 @@ class App extends React.Component<{}, AppState> {
     = Array.from([0, 1], () => React.createRef())
   toasts = React.createRef<ToastRef>()
   hasFocus = 0
-  state = { showUrls: true };
+  state = { showUrls: true }
 
   componentDidMount() {
-    this.focus();
+    this.focus()
   }
 
   focus = (num?: number) => {
     if (num !== undefined)
       this.hasFocus = num
-    this.pane[this.hasFocus].current?.focus();
+    this.pane[this.hasFocus].current?.focus()
   }
 
   onKeyDown = (e: React.KeyboardEvent) => {
@@ -36,7 +36,7 @@ class App extends React.Component<{}, AppState> {
       return
     }
 
-    e.preventDefault();
+    e.preventDefault()
   }
 
   render() {
@@ -66,7 +66,7 @@ class App extends React.Component<{}, AppState> {
         </Row>
         <Toasts ref={this.toasts} />
       </Container>
-    );
+    )
   }
 }
 
@@ -123,9 +123,9 @@ const KeyboardHints = () => {
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
-);
+)
 root.render(
   <React.StrictMode>
     <App />
   </React.StrictMode>
-);
+)

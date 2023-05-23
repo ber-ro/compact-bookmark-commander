@@ -1,6 +1,6 @@
-import React from 'react';
-import { Button, Form, Modal } from 'react-bootstrap';
-import { Ancestors } from './Breadcrumbs';
+import React from 'react'
+import { Button, Form, Modal } from 'react-bootstrap'
+import { Ancestors } from './Breadcrumbs.js'
 
 interface CreateFolderProps {
   index: (a: chrome.bookmarks.BookmarkTreeNode) => number | undefined,
@@ -50,5 +50,5 @@ export const CreateFolder = React.forwardRef(function CreateFolder(
         </Modal.Footer>
       </Modal>
     </>
-  );
+  )
 })

@@ -1,5 +1,5 @@
-import { CBCTooltip } from './Util';
-import React from 'react';
+import { CBCTooltip } from './Util.js'
+import React from 'react'
 
 export const config = Object.fromEntries([
   ["Sort By Title", "st", "Sort by Title instead of URL"],
@@ -52,5 +52,5 @@ export function Options() {
         <Option key={key} title={key} />
       ))}
     </>
-  );
+  )
 }

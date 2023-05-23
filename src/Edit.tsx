@@ -1,6 +1,6 @@
-import React from 'react';
-import { Alert, Button, Form, Modal } from 'react-bootstrap';
-import { Ancestors } from './Breadcrumbs';
+import React from 'react'
+import { Alert, Button, Form, Modal } from 'react-bootstrap'
+import { Ancestors } from './Breadcrumbs.js'
 
 interface EditProps {
   id: string,
@@ -84,5 +84,5 @@ export const Edit = React.forwardRef(function Edit(
         </Modal.Footer>
       </Modal>
     </>
-  );
+  )
 })

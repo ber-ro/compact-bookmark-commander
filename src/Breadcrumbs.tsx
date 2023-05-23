@@ -1,5 +1,5 @@
 import React from 'react'
-import { BookmarkList } from './BookmarkList'
+import { BookmarkList } from './BookmarkList.js'
 
 export const Breadcrumbs = ({ ancestors }: { ancestors: Ancestors }) => {
   return (
@@ -58,7 +58,7 @@ export class Ancestors {
   }
 
   breadcrumbs = () => {
-    return this.ancestors.map((n) => n.title + " /").join(" ");
+    return this.ancestors.map((n) => n.title + " /").join(" ")
   }
 
   gotoParent = () => {
