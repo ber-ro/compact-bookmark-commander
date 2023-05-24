@@ -2,7 +2,7 @@
   "scripts": {
     "precreate": "npm run build",
     "create": "cd prod && powershell Compress-Archive -force * chrome.zip",
-    "build": "babel src --extensions .tsx --out-dir prod/app && node build.mjs",
+    "build": "babel src --extensions .tsx --out-dir prod/app && gulp copy",
     "build:dev": "babel src --extensions .tsx --out-dir dev/app && gulp copy --dev"
   },
   "babel": {
@@ -28,7 +28,6 @@
     "@typescript-eslint/eslint-plugin": "^5.57.1",
     "@typescript-eslint/parser": "^5.57.1",
     "bootstrap": "^5.2.3",
-    "cpy": "^9.0.1",
     "eslint": "^8.37.0",
     "eslint-plugin-react": "^7.32.2",
     "react": "^18.2.0",
