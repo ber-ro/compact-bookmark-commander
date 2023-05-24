@@ -20,6 +20,12 @@ async function copy() {
   return copyLibs()
 }
 
+// Copy files synchronously.
+// spec:
+// [[destination1, source1a, source1b, ...],
+//  [destination2, source2a, source2b, ...],
+// ...
+// ]
 async function copyList(spec) {
   for (const i of spec)
     await new Promise(resolve => {
@@ -35,21 +41,21 @@ function copyLibs() {
 
   libs = [
     `node_modules/bootstrap/dist/css/bootstrap${cfgMin}.css`,
-    `node_modules/react-bootstrap/dist/react-bootstrap.min.js`,
     `node_modules/react-bootstrap/dist/react-bootstrap.min.js.LICENSE.txt`,
+    `node_modules/react-bootstrap/dist/react-bootstrap.min.js`,
     `node_modules/react-dom/umd/react-dom.${cfgReact}.js`,
     `node_modules/react/umd/react.${cfgReact}.js`,
+    `node_modules/systemjs/dist/extras/amd${cfgMin}.js`,
     `node_modules/systemjs/dist/s${cfgMin}.js`,
-    `node_modules/systemjs/dist/extras/amd${cfgMin}.js`
   ]
 
+  // Unify file names, so source can stay the same.
   renLibs = path => {
     path.basename = path.basename.replace(/\.(development|production|min)/g, "")
   }
 
-  return gulp.src(libs[0])
+  return gulp.src(libs)
     .pipe(rmLines({ 'filters': [/# sourceMappingURL=/] }))
-    .pipe(gulp.src(libs.slice(1)))
     .pipe(rename(renLibs))
     .pipe(gulp.dest(env + "/lib"))
 }
