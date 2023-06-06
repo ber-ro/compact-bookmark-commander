@@ -79,7 +79,7 @@ export class BookmarkList extends React.Component<BookmarkListProps, BookmarkLis
     chrome.bookmarks.onRemoved.addListener(this.onRemoved)
     const key = this.props.side
     this.goto((await chrome.storage.local.get(key))[key] ?? "0")
-    window.addEventListener("pagehide", this.save)
+    addEventListener("visibilitychange", this.save)
   }
 
   componentWillUnmount() {
@@ -87,11 +87,11 @@ export class BookmarkList extends React.Component<BookmarkListProps, BookmarkLis
     chrome.bookmarks.onCreated.removeListener(this.onCreated)
     chrome.bookmarks.onMoved.removeListener(this.onMoved)
     chrome.bookmarks.onRemoved.removeListener(this.onRemoved)
-    window.removeEventListener("pagehide", this.save)
+    removeEventListener("visibilitychange", this.save)
   }
 
   save = () => {
-    if (this.dirty)
+    if (document.visibilityState == "hidden" && this.dirty)
       chrome.storage.local.set({ [this.props.side]: this.id })
         .then(() => { this.dirty = false })
   }
@@ -138,7 +138,6 @@ export class BookmarkList extends React.Component<BookmarkListProps, BookmarkLis
   ): Promise<Partial<BookmarkListState>> => {
     if (id) {
       this.id = id
-      this.dirty = this.dirty !== undefined // do not set dirty in initialization
     }
 
     state.nodes = await chrome.bookmarks.getChildren(this.id)
@@ -211,6 +210,7 @@ export class BookmarkList extends React.Component<BookmarkListProps, BookmarkLis
   }
 
   goto(node: BookmarkTreeNode | string) {
+    this.dirty = true
     if (typeof node === "string") {
       this.state.ancestors.refresh(this, undefined, node).then(() => {
         this.getChildren({ index: 0 })
@@ -235,6 +235,7 @@ export class BookmarkList extends React.Component<BookmarkListProps, BookmarkLis
   }
 
   gotoParent() {
+    this.dirty = true
     const ancestors = this.state.ancestors.gotoParent()
     if (ancestors) {
       this.setState({ ancestors: new Ancestors(ancestors) })
