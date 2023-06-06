@@ -15,7 +15,7 @@ export function Option({ title }: {
   if (initialized.current === undefined) {
     initialized.current = true
     chrome.storage.local.get(title).then((result) => {
-      setAll(result[title])
+      setAll(result[title] || false)
     })
   }
 
