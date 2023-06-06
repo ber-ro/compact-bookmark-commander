@@ -35,3 +35,40 @@ export const mutateChangedNodes = (
     }
   }
 }
+
+export class Queue<T> {
+  data = Array<T>()
+  size
+
+  constructor(size: number) {
+    this.size = size
+  }
+
+  add = (val: T) => {
+    this.data.push(val)
+    if (this.data.length > this.size)
+      this.data.shift()
+  }
+
+  at = (n: number) => {
+    return this.data.at(n)
+  }
+
+  dump = (func: (t: T) => string) => {
+    let result = []
+    for (const i of this.data)
+      result.push(func(i))
+    return result
+  }
+}
+
+export class Debounce {
+  queue = new Queue<Date>(5)
+
+  check = () => {
+    let t1 = new Date()
+    let t0 = this.queue.at(0)
+    this.queue.add(t1)
+    return t0 && t1.valueOf() - t0.valueOf() < 100
+  }
+}

@@ -59,7 +59,7 @@ export const Edit = React.forwardRef(function Edit(
           <Form tabIndex={0} onSubmit={onSubmit} id="Edit-Title-URL">
             <Form.Group className="mb-3">
               <Form.Label>Title</Form.Label>
-              <Form.Control type="text" autoFocus
+              <Form.Control type="text" autoFocus className='cbc-bookmark-formcontrol'
                 value={getTitle}
                 onFocus={setFocus}
                 onChange={(e) => setTitle(e.target.value)} />
@@ -67,7 +67,7 @@ export const Edit = React.forwardRef(function Edit(
             {getUrl && (
               <Form.Group>
                 <Form.Label>URL</Form.Label>
-                <Form.Control type="text" as="textarea" rows={8}
+                <Form.Control type="text" as="textarea" rows={8} className='cbc-bookmark-formcontrol'
                   value={getUrl}
                   onFocus={setFocus}
                   onChange={(e) => setUrl(e.target.value)} />

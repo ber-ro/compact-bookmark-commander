@@ -60,6 +60,7 @@ export class BookmarkList extends React.Component<BookmarkListProps, BookmarkLis
   operationIsPending = false
   id = "0"
   dirty: boolean | undefined
+  debounce = new Util.Debounce()
 
   constructor(props: BookmarkListProps) {
     super(props)
@@ -285,8 +286,13 @@ export class BookmarkList extends React.Component<BookmarkListProps, BookmarkLis
   }
 
   onBlur = (e: React.FocusEvent<HTMLDivElement>) => {
-    if (!e.relatedTarget?.classList.contains("bookmarks"))
+    if (this.debounce.check())
+      return
+
+    let focusOn = ".cbc-bookmark-list,.cbc-bookmark-formcontrol,div.fade.modal"
+    if (e.relatedTarget && !e.relatedTarget.matches(focusOn)) {
       setTimeout(() => { this.focus() })
+    }
   }
 
   move = () => {
@@ -357,7 +363,7 @@ export class BookmarkList extends React.Component<BookmarkListProps, BookmarkLis
     const node = this.current()
 
     return (
-      <div className="vstack h-100 p-0 outline bookmarks" ref={this.ref}
+      <div className="vstack h-100 p-0 outline cbc-bookmark-list" ref={this.ref}
         tabIndex={0} onKeyDown={this.onKeyDown} onBlur={this.onBlur}>
         <Breadcrumbs ancestors={this.state.ancestors} />
         <div className="p-0 overflow-auto" ref={this.scrollRef}>

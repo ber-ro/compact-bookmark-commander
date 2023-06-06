@@ -36,7 +36,7 @@ export const CreateFolder = React.forwardRef(function CreateFolder(
           <p className="lead">{ancestors.breadcrumbs()}</p>
           <Form tabIndex={0} onSubmit={createFolder} id="CreateFolder">
             <Form.Group>
-              <Form.Control type="text"
+              <Form.Control type="text" className='cbc-bookmark-formcontrol'
                 autoFocus ref={ref}
                 value={title} onChange={(e) => { setTitle(e.target.value) }} />
             </Form.Group>
