@@ -363,8 +363,11 @@ export class BookmarkList extends React.Component<BookmarkListProps, BookmarkLis
     const node = this.current()
 
     return (
-      <div className="vstack h-100 p-0 outline cbc-bookmark-list" ref={this.ref}
-        tabIndex={0} onKeyDown={this.onKeyDown} onBlur={this.onBlur}>
+      <div className="vstack h-100 p-0 outline cbc-bookmark-list"
+        ref={this.ref}
+        tabIndex={0}
+        onKeyDown={this.onKeyDown}
+        onBlur={this.onBlur}>
         <Breadcrumbs ancestors={this.state.ancestors} />
         <div className="p-0 overflow-auto" ref={this.scrollRef}>
           <div className="mb-0 p-0 pane"> {listItems} </div>
@@ -375,7 +378,8 @@ export class BookmarkList extends React.Component<BookmarkListProps, BookmarkLis
             parentId={this.id}
             ancestors={this.state.ancestors}
             ref={this.refCreateFolder}
-            hide={() => { this.setState({ showCreateFolder: false }) }} />
+            hide={() => { this.setState({ showCreateFolder: false }, this.focus) }}
+          />
         )}
         {this.state.showEdit && node && (
           <Edit
@@ -384,7 +388,8 @@ export class BookmarkList extends React.Component<BookmarkListProps, BookmarkLis
             url={node.url}
             ancestors={this.state.ancestors}
             ref={this.refEdit}
-            hide={() => { this.setState({ showEdit: false }) }} />
+            hide={() => { this.setState({ showEdit: false }, this.focus) }}
+          />
         )}
       </div>
     )
