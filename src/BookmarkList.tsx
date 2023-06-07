@@ -60,7 +60,7 @@ export class BookmarkList extends React.Component<BookmarkListProps, BookmarkLis
   operationIsPending = false
   id = "0"
   dirty: boolean | undefined
-  debounce = new Util.Debounce()
+  infinite = new Util.DetectInfinite()
 
   constructor(props: BookmarkListProps) {
     super(props)
@@ -286,7 +286,7 @@ export class BookmarkList extends React.Component<BookmarkListProps, BookmarkLis
   }
 
   onBlur = (e: React.FocusEvent<HTMLDivElement>) => {
-    if (this.debounce.check())
+    if (this.infinite.check())
       return
 
     let focusOn = ".cbc-bookmark-list,.cbc-bookmark-formcontrol,div.fade.modal"

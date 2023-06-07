@@ -62,13 +62,14 @@ export class Queue<T> {
   }
 }
 
-export class Debounce {
+export class DetectInfinite {
   queue = new Queue<Date>(5)
 
   check = () => {
     let t1 = new Date()
     let t0 = this.queue.at(0)
     this.queue.add(t1)
+    // less than 100ms for last 5 events?
     return t0 && t1.valueOf() - t0.valueOf() < 100
   }
 }
