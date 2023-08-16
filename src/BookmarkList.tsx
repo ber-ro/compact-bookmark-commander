@@ -106,9 +106,11 @@ export class BookmarkList extends React.Component<BookmarkListProps, BookmarkLis
       this.setState({ ancestors: new Ancestors(ancestors) })
   }
 
-  onCreated = (id: string, bookmark: BookmarkTreeNode) => {
-    if (bookmark.parentId === this.id)
-      this.getChildren()
+  onCreated = (id: string, node: BookmarkTreeNode) => {
+    if (node.parentId === this.id)
+      this.getChildren(
+        this.state.showCreateFolder && !node.url ? { id: node.id } : {}
+      )
   }
 
   onMoved = (id: string, mi: chrome.bookmarks.BookmarkMoveInfo) => {
