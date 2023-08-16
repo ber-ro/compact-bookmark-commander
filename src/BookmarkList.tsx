@@ -139,9 +139,8 @@ export class BookmarkList extends React.Component<BookmarkListProps, BookmarkLis
     state: Partial<BookmarkListState & { id: string }> = {},
     id?: string
   ): Promise<Partial<BookmarkListState>> => {
-    if (id) {
+    if (id)
       this.id = id
-    }
 
     state.nodes = await chrome.bookmarks.getChildren(this.id)
 
