@@ -59,7 +59,7 @@ export class BookmarkList extends React.Component<BookmarkListProps, BookmarkLis
   scrollRef = React.createRef<HTMLDivElement>()
   operationIsPending = false
   id = "0"
-  dirty: boolean | undefined
+  dirty = false
   infinite = new Util.DetectInfinite()
 
   constructor(props: BookmarkListProps) {
