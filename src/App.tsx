@@ -16,15 +16,29 @@ class App extends React.Component<{}, AppState> {
   toasts = React.createRef<ToastRef>()
   hasFocus = 0
   state = { showUrls: true }
+  dirty = false
 
-  componentDidMount() {
-    this.focus()
+  async componentDidMount() {
+    addEventListener("visibilitychange", this.save)
+    const saved = (await chrome.storage.local.get("hasFocus"))["hasFocus"]
+    this.focus(saved)
+  }
+
+  componentWillUnmount() {
+    removeEventListener("visibilitychange", this.save)
   }
 
   focus = (num?: number) => {
+    this.dirty = true
     if (num !== undefined)
       this.hasFocus = num
     this.pane[this.hasFocus].current?.focus()
+  }
+
+  save = () => {
+    if (document.visibilityState == "hidden" && this.dirty)
+      chrome.storage.local.set({ hasFocus: this.hasFocus })
+        .then(() => { this.dirty = false })
   }
 
   onKeyDown = (e: React.KeyboardEvent) => {
