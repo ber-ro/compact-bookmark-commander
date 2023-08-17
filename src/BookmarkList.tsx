@@ -79,7 +79,8 @@ export class BookmarkList extends React.Component<BookmarkListProps, BookmarkLis
     chrome.bookmarks.onMoved.addListener(this.onMoved)
     chrome.bookmarks.onRemoved.addListener(this.onRemoved)
     const key = this.props.side
-    this.goto((await chrome.storage.local.get(key))[key] ?? "0")
+    const saved = (await chrome.storage.local.get(key))[key]
+    this.goto(saved?.id ?? "0", saved?.current)
     addEventListener("visibilitychange", this.save)
   }
 
@@ -93,7 +94,9 @@ export class BookmarkList extends React.Component<BookmarkListProps, BookmarkLis
 
   save = () => {
     if (document.visibilityState == "hidden" && this.dirty)
-      chrome.storage.local.set({ [this.props.side]: this.id })
+      chrome.storage.local.set({
+        [this.props.side]: { id: this.id, current: this.current()?.id }
+      })
         .then(() => { this.dirty = false })
   }
 
@@ -109,7 +112,7 @@ export class BookmarkList extends React.Component<BookmarkListProps, BookmarkLis
   onCreated = (id: string, node: BookmarkTreeNode) => {
     if (node.parentId === this.id)
       this.getChildren(
-        this.state.showCreateFolder && !node.url ? { id: node.id } : {}
+        this.state.showCreateFolder && !node.url ? node.id : undefined
       )
   }
 
@@ -136,21 +139,23 @@ export class BookmarkList extends React.Component<BookmarkListProps, BookmarkLis
   }
 
   getChildren = async (
-    state: Partial<BookmarkListState & { id: string }> = {},
-    id?: string
-  ): Promise<Partial<BookmarkListState>> => {
+    index?: number | string /* id */,
+    id?: string,
+  ) => {
     if (id)
       this.id = id
-
+    const state: Partial<BookmarkListState> = {}
     state.nodes = await chrome.bookmarks.getChildren(this.id)
 
-    if (!state.id && this.state.index !== undefined && this.state.nodes.length)
-      state.id = this.state.nodes[this.state.index].id
-    if (state.id) {
-      const index = state.nodes?.findIndex((n) => n.id === state.id)
-      if (index !== -1)
-        state.index = index
+    if (index == undefined)
+      index = this.current()?.id
+    if (typeof index === "string") {
+      const idx = state.nodes?.findIndex(n => n.id === index)
+      if (idx !== -1)
+        state.index = idx
     }
+    else if (typeof index === "number")
+      state.index = index
 
     return new Promise((resolve) => {
       this.setState(state as BookmarkListState, () => resolve(state))
@@ -211,16 +216,17 @@ export class BookmarkList extends React.Component<BookmarkListProps, BookmarkLis
     this.setState({ index: idx })
   }
 
-  goto(node: BookmarkTreeNode | string) {
+  goto(node: BookmarkTreeNode | string /* id */, index: string | number = 0) {
     this.dirty = true
     if (typeof node === "string") {
       this.state.ancestors.refresh(this, undefined, node).then(() => {
-        this.getChildren({ index: 0 })
+        this.getChildren(index)
       })
     } else {
+      // sub-node
       const ancestors = new Ancestors([...this.state.ancestors.ancestors, node])
       this.setState({ ancestors })
-      this.getChildren({ index: 0 }, node.id)
+      this.getChildren(0, node.id)
     }
   }
 
@@ -241,7 +247,7 @@ export class BookmarkList extends React.Component<BookmarkListProps, BookmarkLis
     const ancestors = this.state.ancestors.gotoParent()
     if (ancestors) {
       this.setState({ ancestors: new Ancestors(ancestors) })
-      this.getChildren({ id: this.id }, ancestors.at(-1)?.id)
+      this.getChildren(this.id, ancestors.at(-1)?.id)
     }
   }
 
