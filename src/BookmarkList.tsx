@@ -214,6 +214,7 @@ export class BookmarkList extends React.Component<BookmarkListProps, BookmarkLis
     else if (idx > len)
       idx = 0
     this.setState({ index: idx })
+    this.dirty = true
   }
 
   goto(node: BookmarkTreeNode | string /* id */, index: string | number = 0) {
