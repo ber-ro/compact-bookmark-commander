@@ -1,10 +1,6 @@
 {
   "scripts": {
-    "preinstall": "npx only-allow pnpm",
-    "precreate": "npm run build",
-    "create": "cd prod && powershell Compress-Archive -force * chrome.zip",
-    "build": "babel src --extensions .tsx --out-dir prod/app && gulp copy",
-    "build:dev": "babel src --extensions .tsx --out-dir dev/app && gulp copy --dev"
+    "preinstall": "npx only-allow pnpm"
   },
   "babel": {
     "presets": [
